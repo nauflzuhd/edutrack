@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.shape.SVGPath?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+
+<!--
+    dashboard.fxml - Dashboard Utama EduTrack
+    Layout: BorderPane — sidebar kiri + content area kanan (Orange theme + background decals)
+-->
+<BorderPane
+    xmlns="http://javafx.com/javafx/21"
+    xmlns:fx="http://javafx.com/fxml/1"
+    fx:controller="com.doamamah.edutrack.fe.controller.DashboardController"
+    styleClass="dashboard-root">
+
+    <!-- ==================== SIDEBAR (LEFT) ==================== -->
+    <left>
+        <VBox
+            fx:id="sidebar"
+            styleClass="sidebar"
+            spacing="0"
+            prefWidth="240"
+            minWidth="200">
+
+            <!-- Header: Logo kustom + Nama -->
+            <VBox styleClass="sidebar-header" spacing="4" alignment="CENTER">
+                <padding><Insets top="18" right="16" bottom="18" left="16"/></padding>
+                <HBox spacing="10" alignment="CENTER">
+                    <ImageView fitWidth="48" fitHeight="48" preserveRatio="true" smooth="true">
+                        <image>
+                            <Image url="@../images/mascot_face.png"/>
+                        </image>
+                    </ImageView>
+                    <VBox spacing="0" alignment="CENTER_LEFT">
+                        <Label text="EduTrack" styleClass="sidebar-app-name"/>
+                        <Label text="by Doa Mamah 2.0" styleClass="sidebar-brand-sub" style="-fx-font-weight: bold;"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+
+            <!-- Profil Pengguna -->
+            <VBox
+                fx:id="profileSection"
+                styleClass="sidebar-profile"
+                spacing="6"
+                alignment="CENTER">
+                <padding><Insets top="18" right="14" bottom="18" left="14"/></padding>
+                <StackPane styleClass="avatar-circle">
+                    <Label fx:id="avatarLabel" text="?" styleClass="avatar-text"/>
+                </StackPane>
+                <Label fx:id="profileNameLabel" text="Memuat..." styleClass="profile-name"/>
+                <Label fx:id="profileRoleLabel" text="-" styleClass="profile-role"/>
+            </VBox>
+
+            <Separator styleClass="sidebar-separator"/>
+
+            <!-- Tombol Navigasi -->
+            <VBox styleClass="sidebar-nav" spacing="4" VBox.vgrow="ALWAYS">
+                <padding><Insets top="8" right="10" bottom="8" left="10"/></padding>
+
+                <Button
+                    fx:id="btnDashboard"
+                    text="Dashboard"
+                    styleClass="nav-btn, nav-btn-active"
+                    maxWidth="Infinity"
+                    onAction="#showDashboardContent">
+                    <graphic>
+                        <SVGPath content="M3 13h1v7c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-7h1a1 1 0 00.7-1.7l-9-9a1 1 0 00-1.4 0l-9 9A1 1 0 003 13zm7 7v-5h4v5h-4z" styleClass="nav-icon" scaleX="0.85" scaleY="0.85"/>
+                    </graphic>
+                </Button>
+
+                <Button
+                    fx:id="btnMaterials"
+                    text="Daftar Materi"
+                    styleClass="nav-btn"
+                    maxWidth="Infinity"
+                    onAction="#showMaterialsContent">
+                    <graphic>
+                        <SVGPath content="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z" styleClass="nav-icon" scaleX="0.85" scaleY="0.85"/>
+                    </graphic>
+                </Button>
+
+                <Button
+                    fx:id="btnQuiz"
+                    text="Kuis"
+                    styleClass="nav-btn"
+                    maxWidth="Infinity"
+                    onAction="#showQuizContent">
+                    <graphic>
+                        <SVGPath content="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" styleClass="nav-icon" scaleX="0.85" scaleY="0.85"/>
+                    </graphic>
+                </Button>
+
+                <Button
+                    fx:id="btnCreateMaterial"
+                    text="Tambah Materi"
+                    styleClass="nav-btn"
+                    maxWidth="Infinity"
+                    onAction="#showCreateMaterialContent"
+                    visible="false"
+                    managed="false">
+                    <graphic>
+                        <SVGPath content="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" styleClass="nav-icon" scaleX="0.85" scaleY="0.85"/>
+                    </graphic>
+                </Button>
+            </VBox>
+
+            <Region VBox.vgrow="ALWAYS"/>
+
+            <!-- Logout -->
+            <VBox styleClass="sidebar-footer">
+                <padding><Insets top="8" right="10" bottom="14" left="10"/></padding>
+                <Separator styleClass="sidebar-separator"/>
+                <Button
+                    fx:id="btnLogout"
+                    text="Logout"
+                    styleClass="nav-btn, nav-btn-logout"
+                    maxWidth="Infinity"
+                    onAction="#handleLogout">
+                    <graphic>
+                        <SVGPath content="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" styleClass="nav-icon" scaleX="0.85" scaleY="0.85"/>
+                    </graphic>
+                </Button>
+            </VBox>
+        </VBox>
+    </left>
+
+    <!-- ==================== CONTENT AREA (CENTER) ==================== -->
+    <center>
+        <VBox styleClass="content-wrapper">
+            <!-- Header Bar -->
+            <HBox styleClass="content-header" alignment="CENTER_LEFT" spacing="12">
+                <padding><Insets top="14" right="24" bottom="14" left="24"/></padding>
+                <Label fx:id="contentTitleLabel" text="Dashboard" styleClass="content-title"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="greetingLabel" text="Selamat datang!" styleClass="greeting-label"/>
+            </HBox>
+
+            <!-- Area Konten Dinamis dengan Decal Background -->
+            <StackPane VBox.vgrow="ALWAYS">
+                <!-- Decal Hiasan Background (Absolut) -->
+                <AnchorPane mouseTransparent="true" StackPane.alignment="CENTER">
+                    <SVGPath content="M10 0 L13 7 L20 8 L15 13 L16 20 L10 16 L4 20 L5 13 L0 8 L7 7 Z" styleClass="bg-decor-star" scaleX="1.3" scaleY="1.3" AnchorPane.topAnchor="140.0" AnchorPane.leftAnchor="120.0"/>
+                    <SVGPath content="M10 0 L13 7 L20 8 L15 13 L16 20 L10 16 L4 20 L5 13 L0 8 L7 7 Z" styleClass="bg-decor-star" scaleX="1.4" scaleY="1.4" AnchorPane.topAnchor="280.0" AnchorPane.rightAnchor="240.0"/>
+                    <SVGPath content="M10 0 L13 7 L20 8 L15 13 L16 20 L10 16 L4 20 L5 13 L0 8 L7 7 Z" styleClass="bg-decor-star-small" scaleX="0.9" scaleY="0.9" AnchorPane.bottomAnchor="180.0" AnchorPane.leftAnchor="280.0"/>
+                    
+                    <!-- Crescent Moon -->
+                    <SVGPath content="M12 2a15.3 15.3 0 0 1 4 7 15.3 15.3 0 0 1-4 7 10 10 0 0 0 0-14z" styleClass="bg-decor-moon" scaleX="1.5" scaleY="1.5" AnchorPane.topAnchor="140.0" AnchorPane.rightAnchor="160.0"/>
+                    <!-- Wave Curves (Starry Night theme) -->
+                    <SVGPath content="M 0,20 C 150,120 350,-80 500,20" styleClass="bg-decor-wave" scaleX="1.3" scaleY="1.0" AnchorPane.bottomAnchor="120.0" AnchorPane.leftAnchor="80.0"/>
+                    <SVGPath content="M 0,40 C 120,-40 280,120 400,40" styleClass="bg-decor-wave" scaleX="1.2" scaleY="1.0" AnchorPane.topAnchor="300.0" AnchorPane.leftAnchor="100.0"/>
+                    
+                    <!-- Graduation Cap -->
+                    <SVGPath content="M12 3 L2 8 L12 13 L22 8 Z M5 12 V16 C5 17.5 8 19 12 19 C16 19 19 17.5 19 16 V12" styleClass="bg-decor-cap" scaleX="1.5" scaleY="1.5" AnchorPane.topAnchor="100.0" AnchorPane.rightAnchor="320.0"/>
+                    <!-- Open Book -->
+                    <SVGPath content="M12 21 C9 21 4 19 2 19 V4 C4 4 9 6 12 6 C15 6 20 4 22 4 V19 C20 19 15 21 12 21 Z M12 6 V21" styleClass="bg-decor-book" scaleX="1.3" scaleY="1.3" AnchorPane.bottomAnchor="240.0" AnchorPane.leftAnchor="180.0"/>
+                    <!-- Lightbulb -->
+                    <SVGPath content="M9 21h6v-2H9v2zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z" styleClass="bg-decor-lightbulb" scaleX="1.4" scaleY="1.4" AnchorPane.topAnchor="250.0" AnchorPane.leftAnchor="320.0"/>
+                    <!-- Owl Outline -->
+                    <SVGPath content="M12 2c-3.31 0-6 2.69-6 6v4c0 3.31 2.69 6 6 6s6-2.69 6-6V8c0-3.31-2.69-6-6-6zm-2 5c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm4 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm-2 7c-1.1 0-2-.9-2-2h4c0 1.1-.9 2-2 2z" styleClass="bg-decor-owl" scaleX="1.5" scaleY="1.5" AnchorPane.bottomAnchor="160.0" AnchorPane.rightAnchor="120.0"/>
+                </AnchorPane>
+
+                <!-- ScrollPane Area Utama -->
+                <ScrollPane
+                    fx:id="contentScrollPane"
+                    fitToWidth="true"
+                    styleClass="content-scroll">
+                    <VBox
+                        fx:id="contentArea"
+                        styleClass="content-area"
+                        spacing="16">
+                        <padding><Insets top="24" right="24" bottom="24" left="24"/></padding>
+                        <Label text="Memuat konten..." styleClass="placeholder-text"/>
+                    </VBox>
+                </ScrollPane>
+            </StackPane>
+        </VBox>
+    </center>
+
+</BorderPane>
