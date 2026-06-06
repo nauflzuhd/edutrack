@@ -1,4 +1,5 @@
 package com.doamamah.edutrack.fe.user;
+import com.doamamah.edutrack.fe.enrollment.EnrollmentService;
 
 import com.doamamah.edutrack.fe.user.Student;
 import com.doamamah.edutrack.fe.user.UserService;

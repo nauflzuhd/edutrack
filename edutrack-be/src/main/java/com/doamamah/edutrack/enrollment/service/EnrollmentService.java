@@ -1,10 +1,10 @@
-package com.doamamah.edutrack.auth.service;
+package com.doamamah.edutrack.enrollment.service;
 
-import com.doamamah.edutrack.auth.model.Enrollment;
+import com.doamamah.edutrack.enrollment.model.Enrollment;
 import com.doamamah.edutrack.auth.model.Student;
 import com.doamamah.edutrack.auth.model.Teacher;
 import com.doamamah.edutrack.auth.model.User;
-import com.doamamah.edutrack.auth.repository.EnrollmentRepository;
+import com.doamamah.edutrack.enrollment.repository.EnrollmentRepository;
 import com.doamamah.edutrack.auth.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

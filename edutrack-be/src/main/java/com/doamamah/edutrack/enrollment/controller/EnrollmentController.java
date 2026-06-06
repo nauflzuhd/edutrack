@@ -1,9 +1,9 @@
-package com.doamamah.edutrack.auth.controller;
+package com.doamamah.edutrack.enrollment.controller;
 
-import com.doamamah.edutrack.auth.model.Enrollment;
+import com.doamamah.edutrack.enrollment.model.Enrollment;
 import com.doamamah.edutrack.auth.model.Student;
 import com.doamamah.edutrack.auth.model.Teacher;
-import com.doamamah.edutrack.auth.service.EnrollmentService;
+import com.doamamah.edutrack.enrollment.service.EnrollmentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

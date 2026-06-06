@@ -1,5 +1,7 @@
-package com.doamamah.edutrack.auth.model;
+package com.doamamah.edutrack.enrollment.model;
 
+import com.doamamah.edutrack.auth.model.Student;
+import com.doamamah.edutrack.auth.model.Teacher;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 

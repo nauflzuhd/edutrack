@@ -29,6 +29,9 @@ module com.doamamah.edutrack.fe {
     opens com.doamamah.edutrack.fe.quiz to javafx.fxml, com.google.gson;
     exports com.doamamah.edutrack.fe.quiz;
 
+    opens com.doamamah.edutrack.fe.enrollment to javafx.fxml, com.google.gson;
+    exports com.doamamah.edutrack.fe.enrollment;
+
     opens com.doamamah.edutrack.fe.user to javafx.fxml, com.google.gson;
     exports com.doamamah.edutrack.fe.user;
 

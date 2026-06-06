@@ -221,7 +221,7 @@ public class MaterialView {
         statsTitle.getStyleClass().add("section-title");
         statsTitle.setStyle("-fx-font-size: 15px;");
 
-        com.doamamah.edutrack.fe.user.EnrollmentService enrollmentService = new com.doamamah.edutrack.fe.user.EnrollmentService();
+        com.doamamah.edutrack.fe.enrollment.EnrollmentService enrollmentService = new com.doamamah.edutrack.fe.enrollment.EnrollmentService();
         int totalStudents = enrollmentService.getEnrolledStudents(controller.getCurrentUser().getId()).size();
 
         long videoCount = materials.stream().filter(m -> "VIDEO".equals(m.getMaterialType())).count();

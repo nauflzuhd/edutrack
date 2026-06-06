@@ -119,7 +119,7 @@ public class DashboardController implements Initializable {
         contentArea.getChildren().add(dashboardHomeView.buildContent());
     }
 
-    private final com.doamamah.edutrack.fe.user.EnrollmentService enrollmentService = new com.doamamah.edutrack.fe.user.EnrollmentService();
+    private final com.doamamah.edutrack.fe.enrollment.EnrollmentService enrollmentService = new com.doamamah.edutrack.fe.enrollment.EnrollmentService();
 
     @FXML
     public void showMaterialsContent() {

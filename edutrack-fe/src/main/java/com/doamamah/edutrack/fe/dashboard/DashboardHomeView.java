@@ -80,7 +80,7 @@ public class DashboardHomeView {
         // Stats
         java.util.Map<String, Double> stats = controller.getDashboardService().getDashboardStats();
         
-        com.doamamah.edutrack.fe.user.EnrollmentService enrollmentService = new com.doamamah.edutrack.fe.user.EnrollmentService();
+        com.doamamah.edutrack.fe.enrollment.EnrollmentService enrollmentService = new com.doamamah.edutrack.fe.enrollment.EnrollmentService();
         java.util.List<Long> teacherIds = null;
         if (currentUser instanceof com.doamamah.edutrack.fe.user.Teacher teacher) {
             teacherIds = java.util.List.of(teacher.getId());
@@ -200,8 +200,8 @@ public class DashboardHomeView {
 
         // --- KOLOM KANAN (Aksi Cepat & Tips) ---
         VBox rightColumn = new VBox(20);
-        rightColumn.setPrefWidth(320);
-        rightColumn.setMaxWidth(320);
+        rightColumn.setPrefWidth(250);
+        rightColumn.setMaxWidth(250);
 
         VBox actionsCard = new VBox(14);
         actionsCard.getStyleClass().add("section-box");
@@ -296,7 +296,7 @@ public class DashboardHomeView {
         java.util.List<QuizService.QuizData> teacherQuizzes = qs.getAllQuizzes(teacherIds);
         int totalQuizzes = teacherQuizzes.size();
         
-        com.doamamah.edutrack.fe.user.EnrollmentService enrollmentService = new com.doamamah.edutrack.fe.user.EnrollmentService();
+        com.doamamah.edutrack.fe.enrollment.EnrollmentService enrollmentService = new com.doamamah.edutrack.fe.enrollment.EnrollmentService();
         int totalStudents = enrollmentService.getEnrolledStudents(currentUser.getId()).size();
 
         java.util.Set<Long> teacherQuizIds = new java.util.HashSet<>();
@@ -398,8 +398,9 @@ public class DashboardHomeView {
 
         // --- KOLOM KANAN (Aksi Cepat) ---
         VBox rightColumn = new VBox(20);
-        rightColumn.setPrefWidth(320);
-        rightColumn.setMaxWidth(320);
+        rightColumn.setPrefWidth(280);
+        rightColumn.setMinWidth(280);
+        rightColumn.setMaxWidth(280);
 
         VBox actionsCard = new VBox(14);
         actionsCard.getStyleClass().add("section-box");
@@ -411,29 +412,33 @@ public class DashboardHomeView {
         Button goStudents = new Button("Daftar Siswa");
         goStudents.getStyleClass().addAll("btn-primary", "btn-medium");
         goStudents.setMaxWidth(Double.MAX_VALUE);
+        goStudents.setMinWidth(0);
         goStudents.setOnAction(e -> controller.showStudentsContent());
 
         Button goMaterial = new Button("Kelola Materi");
         goMaterial.getStyleClass().addAll("btn-secondary", "btn-medium");
         goMaterial.setMaxWidth(Double.MAX_VALUE);
+        goMaterial.setMinWidth(0);
         goMaterial.setOnAction(e -> controller.showMaterialsContent());
 
         Button goQuiz = new Button("Kelola Kuis");
         goQuiz.getStyleClass().addAll("btn-secondary", "btn-medium");
-        goQuiz.setStyle("-fx-text-fill: #FF7A00; -fx-border-color: #FF7A00;");
+        goQuiz.setStyle("-fx-background-color: #FFF0E0; -fx-text-fill: #FF7A00; -fx-border-color: #FF7A00; -fx-border-width: 1px; -fx-background-radius: 8px; -fx-border-radius: 8px; -fx-font-weight: bold; -fx-cursor: hand;");
         goQuiz.setMaxWidth(Double.MAX_VALUE);
+        goQuiz.setMinWidth(0);
         goQuiz.setOnAction(e -> controller.showQuizContent());
 
         actionsCard.getChildren().addAll(actionTitle, goStudents, goMaterial, goQuiz);
 
         // Tips Box
-        HBox tipsBox = new HBox(12);
+        HBox tipsBox = new HBox(10);
         tipsBox.getStyleClass().add("tips-box");
         tipsBox.setPadding(new Insets(16));
-        tipsBox.setAlignment(Pos.CENTER_LEFT);
+        tipsBox.setAlignment(Pos.TOP_LEFT);
 
         Label bulb = new Label("💡");
-        bulb.setStyle("-fx-font-size: 28px;");
+        bulb.setStyle("-fx-font-size: 22px;");
+        bulb.setMinWidth(28);
 
         VBox tipContent = new VBox(4);
         Label tipTitle = new Label("Tips Mengajar");
@@ -441,6 +446,7 @@ public class DashboardHomeView {
         Label tipText = new Label("Tambahkan materi kuis secara berkala untuk menjaga antusiasme siswa!");
         tipText.getStyleClass().add("tip-text");
         tipText.setWrapText(true);
+        tipText.setMaxWidth(Double.MAX_VALUE);
         tipContent.getChildren().addAll(tipTitle, tipText);
         HBox.setHgrow(tipContent, Priority.ALWAYS);
 

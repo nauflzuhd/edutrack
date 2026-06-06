@@ -1,6 +1,7 @@
-package com.doamamah.edutrack.fe.user;
+package com.doamamah.edutrack.fe.enrollment;
 
 import com.doamamah.edutrack.fe.user.Teacher;
+import com.doamamah.edutrack.fe.user.Student;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -164,8 +165,8 @@ public class EnrollmentService {
     /**
      * Mengambil daftar siswa yang terdaftar di kelas pengajar.
      */
-    public List<com.doamamah.edutrack.fe.user.Student> getEnrolledStudents(Long teacherId) {
-        List<com.doamamah.edutrack.fe.user.Student> students = new ArrayList<>();
+    public List<Student> getEnrolledStudents(Long teacherId) {
+        List<Student> students = new ArrayList<>();
         try {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(BASE_URL + "/api/enrollments/teacher/" + teacherId))
@@ -186,7 +187,7 @@ public class EnrollmentService {
                     String email = obj.has("email") ? obj.get("email").getAsString() : "";
                     String studentIdObj = obj.has("studentId") ? obj.get("studentId").getAsString() : "";
 
-                    com.doamamah.edutrack.fe.user.Student s = new com.doamamah.edutrack.fe.user.Student(id, username, fullName, email, studentIdObj);
+                    Student s = new Student(id, username, fullName, email, studentIdObj);
                     students.add(s);
                 }
             }

@@ -2,9 +2,9 @@
 -- Password default adalah nama + '123' untuk kemudahan testing
 INSERT INTO users (id, username, password, full_name, email, role, bio, teacher_id, specialization, total_courses, student_id, enrolled_courses)
 VALUES 
-(1, 'teacher', '123', 'Budi Santoso', 'budi.santoso@edutrack.com', 'TEACHER', 'Pengajar Pemrograman Java dan Konsep PBO.', 'TCH-001', 'Pemrograman', 0, NULL, 0),
+(1, 'guru', '123', 'Budi Santoso', 'budi.santoso@edutrack.com', 'TEACHER', 'Pengajar Pemrograman Java dan Konsep PBO.', 'TCH-001', 'Pemrograman', 0, NULL, 0),
 (2, 'pak_eko', 'eko123', 'Eko Purnomo', 'eko.purnomo@edutrack.com', 'TEACHER', 'Ahli Basis Data dan Jaringan Komputer.', 'TCH-002', 'Basis Data', 0, NULL, 0),
-(3, 'student', '123', 'Andi Pratama', 'andi.pratama@edutrack.com', 'STUDENT', 'Siswa yang antusias belajar teknologi.', NULL, NULL, 0, 'STD-001', 0),
+(3, 'siswa', '123', 'Andi Pratama', 'andi.pratama@edutrack.com', 'STUDENT', 'Siswa yang antusias belajar teknologi.', NULL, NULL, 0, 'STD-001', 0),
 (4, 'siswa_baru', 'baru123', 'Siti Rahma', 'siti.rahma@edutrack.com', 'STUDENT', 'Siswa baru di platform EduTrack.', NULL, NULL, 0, 'STD-002', 0);
 
 -- 2. Insert Enrollments
