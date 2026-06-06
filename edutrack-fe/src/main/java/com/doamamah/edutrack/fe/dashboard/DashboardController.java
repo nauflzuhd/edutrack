@@ -1,11 +1,14 @@
-package com.doamamah.edutrack.fe.controller;
+package com.doamamah.edutrack.fe.dashboard;
 
-import com.doamamah.edutrack.fe.model.CourseMaterial;
-import com.doamamah.edutrack.fe.model.Teacher;
-import com.doamamah.edutrack.fe.model.User;
-import com.doamamah.edutrack.fe.service.AuthService;
-import com.doamamah.edutrack.fe.service.MaterialService;
-import com.doamamah.edutrack.fe.util.SceneManager;
+import com.doamamah.edutrack.fe.material.CourseMaterial;
+import com.doamamah.edutrack.fe.user.Teacher;
+import com.doamamah.edutrack.fe.user.User;
+import com.doamamah.edutrack.fe.auth.AuthService;
+import com.doamamah.edutrack.fe.material.MaterialService;
+import com.doamamah.edutrack.fe.core.SceneManager;
+import com.doamamah.edutrack.fe.material.MaterialView;
+import com.doamamah.edutrack.fe.quiz.QuizView;
+import com.doamamah.edutrack.fe.user.StudentListView;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -41,7 +44,7 @@ public class DashboardController implements Initializable {
     @FXML private ScrollPane contentScrollPane;
 
     private final MaterialService materialService = new MaterialService();
-    private final com.doamamah.edutrack.fe.service.DashboardService dashboardService = new com.doamamah.edutrack.fe.service.DashboardService();
+    private final DashboardService dashboardService = new DashboardService();
     private final AuthService authService = new AuthService();
     private User currentUser;
 
@@ -52,7 +55,7 @@ public class DashboardController implements Initializable {
 
     public User getCurrentUser() { return currentUser; }
     public MaterialService getMaterialService() { return materialService; }
-    public com.doamamah.edutrack.fe.service.DashboardService getDashboardService() { return dashboardService; }
+    public DashboardService getDashboardService() { return dashboardService; }
     public VBox getContentArea() { return contentArea; }
     public Label getContentTitleLabel() { return contentTitleLabel; }
 

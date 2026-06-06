@@ -1,7 +1,8 @@
-package com.doamamah.edutrack.fe.controller;
+package com.doamamah.edutrack.fe.user;
 
-import com.doamamah.edutrack.fe.model.Student;
-import com.doamamah.edutrack.fe.service.UserService;
+import com.doamamah.edutrack.fe.user.Student;
+import com.doamamah.edutrack.fe.user.UserService;
+import com.doamamah.edutrack.fe.dashboard.DashboardController;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

@@ -11,7 +11,7 @@
  */
 package com.doamamah.edutrack.fe;
 
-import com.doamamah.edutrack.fe.util.SceneManager;
+import com.doamamah.edutrack.fe.core.SceneManager;
 import javafx.application.Application;
 import javafx.stage.Stage;
 

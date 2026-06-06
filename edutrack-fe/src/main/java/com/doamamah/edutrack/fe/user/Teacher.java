@@ -1,4 +1,4 @@
-package com.doamamah.edutrack.fe.model;
+package com.doamamah.edutrack.fe.user;
 
 /**
  * =====================================================================

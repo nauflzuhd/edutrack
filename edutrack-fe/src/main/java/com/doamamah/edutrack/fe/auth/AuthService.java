@@ -1,8 +1,8 @@
-package com.doamamah.edutrack.fe.service;
+package com.doamamah.edutrack.fe.auth;
 
-import com.doamamah.edutrack.fe.model.Student;
-import com.doamamah.edutrack.fe.model.Teacher;
-import com.doamamah.edutrack.fe.model.User;
+import com.doamamah.edutrack.fe.user.Student;
+import com.doamamah.edutrack.fe.user.Teacher;
+import com.doamamah.edutrack.fe.user.User;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 

@@ -1,4 +1,4 @@
-package com.doamamah.edutrack.fe.service;
+package com.doamamah.edutrack.fe.dashboard;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;

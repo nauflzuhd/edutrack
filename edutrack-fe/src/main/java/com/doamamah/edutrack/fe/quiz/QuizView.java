@@ -1,11 +1,12 @@
-package com.doamamah.edutrack.fe.controller;
+package com.doamamah.edutrack.fe.quiz;
 
-import com.doamamah.edutrack.fe.model.Student;
-import com.doamamah.edutrack.fe.model.Teacher;
-import com.doamamah.edutrack.fe.model.User;
-import com.doamamah.edutrack.fe.service.QuizService;
-import com.doamamah.edutrack.fe.service.QuizService.QuizData;
-import com.doamamah.edutrack.fe.service.QuizService.QuestionData;
+import com.doamamah.edutrack.fe.user.Student;
+import com.doamamah.edutrack.fe.user.Teacher;
+import com.doamamah.edutrack.fe.user.User;
+import com.doamamah.edutrack.fe.quiz.QuizService;
+import com.doamamah.edutrack.fe.quiz.QuizService.QuizData;
+import com.doamamah.edutrack.fe.quiz.QuizService.QuestionData;
+import com.doamamah.edutrack.fe.dashboard.DashboardController;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

@@ -1,6 +1,6 @@
-package com.doamamah.edutrack.fe.util;
+package com.doamamah.edutrack.fe.core;
 
-import com.doamamah.edutrack.fe.model.User;
+import com.doamamah.edutrack.fe.user.User;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -47,11 +47,11 @@ public class SceneManager {
     }
 
     public void showLogin() {
-        loadScene("/com/doamamah/edutrack/fe/view/login.fxml");
+        loadScene("/com/doamamah/edutrack/fe/auth/login.fxml");
     }
 
     public void showDashboard() {
-        loadScene("/com/doamamah/edutrack/fe/view/dashboard.fxml");
+        loadScene("/com/doamamah/edutrack/fe/dashboard/dashboard.fxml");
     }
 
     /**

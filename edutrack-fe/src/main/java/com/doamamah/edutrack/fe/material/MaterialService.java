@@ -1,8 +1,8 @@
-package com.doamamah.edutrack.fe.service;
+package com.doamamah.edutrack.fe.material;
 
-import com.doamamah.edutrack.fe.model.CourseMaterial;
-import com.doamamah.edutrack.fe.model.TextMaterial;
-import com.doamamah.edutrack.fe.model.VideoMaterial;
+import com.doamamah.edutrack.fe.material.CourseMaterial;
+import com.doamamah.edutrack.fe.material.TextMaterial;
+import com.doamamah.edutrack.fe.material.VideoMaterial;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -242,5 +242,50 @@ public class MaterialService {
                 System.err.println("Backend tidak merespon, penghapusan materi disimpan dalam memori lokal saja: " + e.getMessage());
             }
         }).start();
+    }
+
+    /**
+     * Menandai materi telah dibaca/ditonton oleh siswa.
+     */
+    public void markAsViewed(Long materialId, Long studentId) {
+        new Thread(() -> {
+            try {
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create(BASE_URL + "/api/materials/" + materialId + "/view?studentId=" + studentId))
+                        .POST(HttpRequest.BodyPublishers.noBody())
+                        .timeout(Duration.ofSeconds(5))
+                        .build();
+                httpClient.send(request, HttpResponse.BodyHandlers.discarding());
+                System.out.println("Berhasil menandai materi " + materialId + " telah dibaca.");
+            } catch (Exception e) {
+                System.err.println("Gagal menandai materi dibaca ke backend: " + e.getMessage());
+            }
+        }).start();
+    }
+
+    /**
+     * Mengambil daftar ID materi yang sudah diakses oleh siswa.
+     */
+    public List<Long> getViewedMaterials(Long studentId) {
+        List<Long> viewedIds = new ArrayList<>();
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(BASE_URL + "/api/materials/progress/" + studentId))
+                    .GET()
+                    .timeout(Duration.ofSeconds(5))
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 200) {
+                JsonArray array = gson.fromJson(response.body(), JsonArray.class);
+                for (int i = 0; i < array.size(); i++) {
+                    viewedIds.add(array.get(i).getAsLong());
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Gagal mengambil progress materi: " + e.getMessage());
+        }
+        return viewedIds;
     }
 }

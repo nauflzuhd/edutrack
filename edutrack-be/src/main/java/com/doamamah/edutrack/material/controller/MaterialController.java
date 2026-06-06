@@ -85,4 +85,27 @@ public class MaterialController {
                     .body(Map.of("error", e.getMessage()));
         }
     }
+
+    /**
+     * POST /api/materials/{id}/view?studentId=...
+     * Menandai materi telah dibaca/ditonton.
+     */
+    @PostMapping("/{id}/view")
+    public ResponseEntity<?> markAsViewed(@PathVariable Long id, @RequestParam Long studentId) {
+        try {
+            materialService.markAsViewed(id, studentId);
+            return ResponseEntity.ok(Map.of("message", "Materi ditandai sudah dibaca"));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    /**
+     * GET /api/materials/progress/{studentId}
+     * Mengambil daftar ID materi yang sudah dibaca oleh siswa.
+     */
+    @GetMapping("/progress/{studentId}")
+    public ResponseEntity<List<Long>> getViewedMaterials(@PathVariable Long studentId) {
+        return ResponseEntity.ok(materialService.getViewedMaterials(studentId));
+    }
 }

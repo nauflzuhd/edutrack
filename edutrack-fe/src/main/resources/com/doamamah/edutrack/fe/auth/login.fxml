@@ -14,7 +14,7 @@
 <HBox
     xmlns="http://javafx.com/javafx/21"
     xmlns:fx="http://javafx.com/fxml/1"
-    fx:controller="com.doamamah.edutrack.fe.controller.LoginController"
+    fx:controller="com.doamamah.edutrack.fe.auth.LoginController"
     styleClass="login-root"
     prefWidth="1024"
     prefHeight="768">
@@ -82,21 +82,14 @@
                 </ImageView>
             </StackPane>
 
-            <!-- Statistik singkat — hiasan decorative -->
-            <HBox spacing="16" alignment="CENTER">
-                <VBox spacing="2" alignment="CENTER" styleClass="left-stat-box" prefWidth="100">
-                    <Label text="100+" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #FF7A00;"/>
-                    <Label text="Materi" style="-fx-font-size: 11px; -fx-text-fill: #6B7280;"/>
-                </VBox>
-                <VBox spacing="2" alignment="CENTER" styleClass="left-stat-box" prefWidth="100">
-                    <Label text="500+" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #059669;"/>
-                    <Label text="Siswa" style="-fx-font-size: 11px; -fx-text-fill: #6B7280;"/>
-                </VBox>
-                <VBox spacing="2" alignment="CENTER" styleClass="left-stat-box" prefWidth="100">
-                    <Label text="50+" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #D97706;"/>
-                    <Label text="Kuis" style="-fx-font-size: 11px; -fx-text-fill: #6B7280;"/>
-                </VBox>
-            </HBox>
+            <!-- Motivational Quote -->
+            <VBox styleClass="left-stat-box" spacing="8" alignment="CENTER" maxWidth="320">
+                <padding><Insets top="16" right="20" bottom="16" left="20"/></padding>
+                <Label text="💡" style="-fx-font-size: 24px;"/>
+                <Label text="&quot;Pendidikan adalah senjata paling mematikan di dunia, karena dengan pendidikan, Anda dapat mengubah dunia.&quot;" 
+                       style="-fx-font-size: 13px; -fx-text-fill: #4B5563; -fx-font-style: italic; -fx-text-alignment: center;" wrapText="true"/>
+                <Label text="— Nelson Mandela" style="-fx-font-size: 11px; -fx-text-fill: #FF7A00; -fx-font-weight: bold;"/>
+            </VBox>
 
             <!-- Daftar Fitur -->
             <VBox spacing="10" alignment="CENTER">
@@ -164,7 +157,7 @@
 
                     <!-- Kotak info akun demo -->
                     <VBox styleClass="demo-hint-box" spacing="6">
-                        <Label text="Akun Demo (tanpa backend)" styleClass="demo-hint-title"/>
+                        <Label text="Akun Demo yang Tersedia" styleClass="demo-hint-title"/>
                         <Label text="Siswa    →  siswa / 123" styleClass="demo-hint-text"/>
                         <Label text="Pengajar →  guru  / 123" styleClass="demo-hint-text"/>
                     </VBox>

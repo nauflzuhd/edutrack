@@ -1,10 +1,11 @@
-package com.doamamah.edutrack.fe.controller;
+package com.doamamah.edutrack.fe.material;
 
-import com.doamamah.edutrack.fe.model.CourseMaterial;
-import com.doamamah.edutrack.fe.model.TextMaterial;
-import com.doamamah.edutrack.fe.model.VideoMaterial;
-import com.doamamah.edutrack.fe.model.Teacher;
-import com.doamamah.edutrack.fe.model.User;
+import com.doamamah.edutrack.fe.material.CourseMaterial;
+import com.doamamah.edutrack.fe.material.TextMaterial;
+import com.doamamah.edutrack.fe.material.VideoMaterial;
+import com.doamamah.edutrack.fe.user.Teacher;
+import com.doamamah.edutrack.fe.user.User;
+import com.doamamah.edutrack.fe.dashboard.DashboardController;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -363,6 +364,11 @@ public class MaterialView {
             controller.getContentArea().getChildren().clear();
             controller.getContentArea().getChildren().add(materialUI);
             controller.getContentTitleLabel().setText(material.getTitle());
+
+            User currentUser = controller.getCurrentUser();
+            if (currentUser instanceof com.doamamah.edutrack.fe.user.Student) {
+                controller.getMaterialService().markAsViewed(material.getId(), currentUser.getId());
+            }
         });
 
         actions.getChildren().add(viewBtn);

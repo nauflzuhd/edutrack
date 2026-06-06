@@ -17,16 +17,21 @@ module com.doamamah.edutrack.fe {
     opens com.doamamah.edutrack.fe to javafx.fxml;
     exports com.doamamah.edutrack.fe;
 
-    opens com.doamamah.edutrack.fe.controller to javafx.fxml;
-    exports com.doamamah.edutrack.fe.controller;
+    opens com.doamamah.edutrack.fe.auth to javafx.fxml, com.google.gson;
+    exports com.doamamah.edutrack.fe.auth;
 
-    // Buka model ke Gson juga (agar JSON parsing bisa akses field via reflection)
-    opens com.doamamah.edutrack.fe.model to javafx.fxml, com.google.gson;
-    exports com.doamamah.edutrack.fe.model;
+    opens com.doamamah.edutrack.fe.dashboard to javafx.fxml, com.google.gson;
+    exports com.doamamah.edutrack.fe.dashboard;
 
-    opens com.doamamah.edutrack.fe.service to javafx.fxml, com.google.gson;
-    exports com.doamamah.edutrack.fe.service;
+    opens com.doamamah.edutrack.fe.material to javafx.fxml, com.google.gson;
+    exports com.doamamah.edutrack.fe.material;
 
-    opens com.doamamah.edutrack.fe.util to javafx.fxml;
-    exports com.doamamah.edutrack.fe.util;
+    opens com.doamamah.edutrack.fe.quiz to javafx.fxml, com.google.gson;
+    exports com.doamamah.edutrack.fe.quiz;
+
+    opens com.doamamah.edutrack.fe.user to javafx.fxml, com.google.gson;
+    exports com.doamamah.edutrack.fe.user;
+
+    opens com.doamamah.edutrack.fe.core to javafx.fxml;
+    exports com.doamamah.edutrack.fe.core;
 }

@@ -1,10 +1,10 @@
-package com.doamamah.edutrack.fe.controller;
+package com.doamamah.edutrack.fe.auth;
 
-import com.doamamah.edutrack.fe.model.Student;
-import com.doamamah.edutrack.fe.model.Teacher;
-import com.doamamah.edutrack.fe.model.User;
-import com.doamamah.edutrack.fe.service.AuthService;
-import com.doamamah.edutrack.fe.util.SceneManager;
+import com.doamamah.edutrack.fe.user.Student;
+import com.doamamah.edutrack.fe.user.Teacher;
+import com.doamamah.edutrack.fe.user.User;
+import com.doamamah.edutrack.fe.auth.AuthService;
+import com.doamamah.edutrack.fe.core.SceneManager;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;

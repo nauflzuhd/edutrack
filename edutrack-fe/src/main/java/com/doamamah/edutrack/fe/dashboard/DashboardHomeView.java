@@ -1,8 +1,9 @@
-package com.doamamah.edutrack.fe.controller;
+package com.doamamah.edutrack.fe.dashboard;
 
-import com.doamamah.edutrack.fe.model.Student;
-import com.doamamah.edutrack.fe.model.Teacher;
-import com.doamamah.edutrack.fe.model.User;
+import com.doamamah.edutrack.fe.user.Student;
+import com.doamamah.edutrack.fe.user.Teacher;
+import com.doamamah.edutrack.fe.user.User;
+import com.doamamah.edutrack.fe.quiz.QuizService;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -78,19 +79,19 @@ public class DashboardHomeView {
 
         // Stats
         java.util.Map<String, Double> stats = controller.getDashboardService().getDashboardStats();
-        int totalMaterials = stats.getOrDefault("totalMaterials", 0.0).intValue();
-        int totalQuizzes = stats.getOrDefault("totalQuizzes", 0.0).intValue();
+        int totalMaterials = controller.getMaterialService().getAllMaterials().size();
+        QuizService quizService = new QuizService();
+        int totalQuizzes = quizService.getAllQuizzes().size();
         
         int totalAttempts = 0;
         double avgScore = 0.0;
-        com.doamamah.edutrack.fe.service.QuizService quizService = new com.doamamah.edutrack.fe.service.QuizService();
-        java.util.List<com.doamamah.edutrack.fe.service.QuizService.QuizAttemptData> studentAttempts = quizService.getStudentAttempts(currentUser.getId());
+        java.util.List<QuizService.QuizAttemptData> studentAttempts = quizService.getStudentAttempts(currentUser.getId());
         totalAttempts = studentAttempts.size();
         
         java.util.Set<Long> uniqueQuizzes = new java.util.HashSet<>();
         if (totalAttempts > 0) {
             double sum = 0;
-            for (com.doamamah.edutrack.fe.service.QuizService.QuizAttemptData attempt : studentAttempts) {
+            for (QuizService.QuizAttemptData attempt : studentAttempts) {
                 sum += attempt.getScore();
                 uniqueQuizzes.add(attempt.getQuizId());
             }
@@ -99,10 +100,13 @@ public class DashboardHomeView {
 
         int kuisTersedia = Math.max(0, totalQuizzes - uniqueQuizzes.size());
 
+        java.util.List<Long> viewedMaterials = controller.getMaterialService().getViewedMaterials(currentUser.getId());
+        int materiTersedia = Math.max(0, totalMaterials - viewedMaterials.size());
+
         HBox statsRow = new HBox(14);
         statsRow.setMaxWidth(Double.MAX_VALUE);
         statsRow.getChildren().addAll(
-            buildRichStatCard("Materi Tersedia", String.valueOf(totalMaterials), "materi", "#FF7A00", "📚", 1.0),
+            buildRichStatCard("Materi Tersedia", String.valueOf(materiTersedia), "materi", "#FF7A00", "📚", 1.0),
             buildRichStatCard("Kuis Tersedia",   String.valueOf(kuisTersedia), "kuis",   "#059669", "📝", 1.0),
             buildRichStatCard("Rata-rata Nilai", String.format("%.1f", avgScore), "poin", "#D97706", "🎯", avgScore/100.0)
         );
@@ -153,7 +157,7 @@ public class DashboardHomeView {
         } else {
             int limit = Math.min(3, studentAttempts.size());
             for (int i = 0; i < limit; i++) {
-                com.doamamah.edutrack.fe.service.QuizService.QuizAttemptData att = studentAttempts.get(i);
+                QuizService.QuizAttemptData att = studentAttempts.get(i);
                 HBox attRow = new HBox(12);
                 attRow.setAlignment(Pos.CENTER_LEFT);
                 attRow.setPadding(new Insets(10));
@@ -275,8 +279,9 @@ public class DashboardHomeView {
 
         // Stats
         java.util.Map<String, Double> stats = controller.getDashboardService().getDashboardStats();
-        int totalMaterials = stats.getOrDefault("totalMaterials", 0.0).intValue();
-        int totalQuizzes = stats.getOrDefault("totalQuizzes", 0.0).intValue();
+        int totalMaterials = controller.getMaterialService().getAllMaterials().size();
+        QuizService qs = new QuizService();
+        int totalQuizzes = qs.getAllQuizzes().size();
         int totalStudents = stats.getOrDefault("totalStudents", 0.0).intValue();
         int totalAttempts = stats.getOrDefault("totalQuizAttempts", 0.0).intValue();
 
@@ -326,8 +331,8 @@ public class DashboardHomeView {
         recentHistoryTitle.getStyleClass().add("section-title");
         recentHistorySection.getChildren().add(recentHistoryTitle);
 
-        com.doamamah.edutrack.fe.service.QuizService quizService = new com.doamamah.edutrack.fe.service.QuizService();
-        java.util.List<com.doamamah.edutrack.fe.service.QuizService.QuizAttemptData> allAttempts = quizService.getAllAttempts();
+        QuizService quizService = new QuizService();
+        java.util.List<QuizService.QuizAttemptData> allAttempts = quizService.getAllAttempts();
 
         if (allAttempts.isEmpty()) {
             Label emptyLbl = new Label("Belum ada aktivitas kuis dari siswa.");
@@ -336,7 +341,7 @@ public class DashboardHomeView {
         } else {
             int limit = Math.min(4, allAttempts.size());
             for (int i = 0; i < limit; i++) {
-                com.doamamah.edutrack.fe.service.QuizService.QuizAttemptData att = allAttempts.get(i);
+                QuizService.QuizAttemptData att = allAttempts.get(i);
                 HBox attRow = new HBox(12);
                 attRow.setAlignment(Pos.CENTER_LEFT);
                 attRow.setPadding(new Insets(10));
