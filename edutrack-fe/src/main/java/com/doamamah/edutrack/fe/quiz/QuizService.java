@@ -38,6 +38,8 @@ public class QuizService {
         private final String description;
         private final String difficulty;
         private final List<QuestionData> questions;
+        private String teacherName;
+        private Long teacherId;
 
         public QuizData(long id, String title, String description, String difficulty, List<QuestionData> questions) {
             this.id = id;
@@ -52,6 +54,10 @@ public class QuizService {
         public String getDescription() { return description; }
         public String getDifficulty() { return difficulty; }
         public List<QuestionData> getQuestions() { return questions; }
+        public String getTeacherName() { return teacherName; }
+        public void setTeacherName(String teacherName) { this.teacherName = teacherName; }
+        public Long getTeacherId() { return teacherId; }
+        public void setTeacherId(Long teacherId) { this.teacherId = teacherId; }
 
         public String getColor() {
             if ("Sedang".equals(difficulty)) return "#D97706";
@@ -100,9 +106,19 @@ public class QuizService {
      * Mengambil semua kuis dari backend.
      */
     public List<QuizData> getAllQuizzes() {
+        return getAllQuizzes(null);
+    }
+
+    public List<QuizData> getAllQuizzes(List<Long> teacherIds) {
         try {
+            String url = BASE_URL + "/api/quizzes";
+            if (teacherIds != null && !teacherIds.isEmpty()) {
+                String idsParam = teacherIds.stream().map(String::valueOf).collect(java.util.stream.Collectors.joining(","));
+                url += "?teacherIds=" + idsParam;
+            }
+
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(BASE_URL + "/api/quizzes"))
+                    .uri(URI.create(url))
                     .header("Accept", "application/json")
                     .GET()
                     .timeout(Duration.ofSeconds(5))
@@ -122,9 +138,9 @@ public class QuizService {
     /**
      * Membuat kuis baru di backend.
      */
-    public QuizData createQuiz(String title, String description, String difficulty, List<QuestionData> questions) {
+    public QuizData createQuiz(String title, String description, String difficulty, List<QuestionData> questions, Long teacherId) {
         try {
-            JsonObject json = buildQuizJson(title, description, difficulty, questions);
+            JsonObject json = buildQuizJson(title, description, difficulty, questions, teacherId);
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(BASE_URL + "/api/quizzes"))
@@ -148,7 +164,7 @@ public class QuizService {
      */
     public QuizData updateQuiz(long id, String title, String description, String difficulty, List<QuestionData> questions) {
         try {
-            JsonObject json = buildQuizJson(title, description, difficulty, questions);
+            JsonObject json = buildQuizJson(title, description, difficulty, questions, null);
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(BASE_URL + "/api/quizzes/" + id))
@@ -188,11 +204,14 @@ public class QuizService {
 
     // ========== Helper Methods ==========
 
-    private JsonObject buildQuizJson(String title, String description, String difficulty, List<QuestionData> questions) {
+    private JsonObject buildQuizJson(String title, String description, String difficulty, List<QuestionData> questions, Long teacherId) {
         JsonObject json = new JsonObject();
         json.addProperty("title", title);
         json.addProperty("description", description);
         json.addProperty("difficulty", difficulty);
+        if (teacherId != null) {
+            json.addProperty("teacherId", teacherId);
+        }
 
         JsonArray questionsArray = new JsonArray();
         for (QuestionData q : questions) {
@@ -247,7 +266,13 @@ public class QuizService {
                     ));
                 }
             }
-            return new QuizData(id, title, description, difficulty, questions);
+            String teacherName = obj.has("teacherName") && !obj.get("teacherName").isJsonNull() ? obj.get("teacherName").getAsString() : null;
+            Long teacherId = obj.has("teacherId") && !obj.get("teacherId").isJsonNull() ? obj.get("teacherId").getAsLong() : null;
+
+            QuizData quiz = new QuizData(id, title, description, difficulty, questions);
+            quiz.setTeacherName(teacherName);
+            quiz.setTeacherId(teacherId);
+            return quiz;
         } catch (Exception e) {
             System.err.println("Gagal parse single quiz: " + e.getMessage());
             return null;

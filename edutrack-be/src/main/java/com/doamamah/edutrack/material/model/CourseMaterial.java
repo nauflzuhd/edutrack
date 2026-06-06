@@ -1,5 +1,6 @@
 package com.doamamah.edutrack.material.model;
 
+import com.doamamah.edutrack.auth.model.Teacher;
 import jakarta.persistence.*;
 
 /**
@@ -30,6 +31,10 @@ public class CourseMaterial {
     @Column(columnDefinition = "CLOB")
     private String textContent;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "teacher_id")
+    private Teacher teacher;
+
     // Constructor kosong (diperlukan oleh JPA)
     public CourseMaterial() {}
 
@@ -52,6 +57,7 @@ public class CourseMaterial {
     public String getVideoUrl() { return videoUrl; }
     public int getDurationMinutes() { return durationMinutes; }
     public String getTextContent() { return textContent; }
+    public Teacher getTeacher() { return teacher; }
 
     // --- SETTERS ---
 
@@ -62,4 +68,5 @@ public class CourseMaterial {
     public void setVideoUrl(String videoUrl) { this.videoUrl = videoUrl; }
     public void setDurationMinutes(int durationMinutes) { this.durationMinutes = durationMinutes; }
     public void setTextContent(String textContent) { this.textContent = textContent; }
+    public void setTeacher(Teacher teacher) { this.teacher = teacher; }
 }

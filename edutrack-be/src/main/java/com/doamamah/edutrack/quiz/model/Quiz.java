@@ -1,5 +1,6 @@
 package com.doamamah.edutrack.quiz.model;
 
+import com.doamamah.edutrack.auth.model.Teacher;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +33,10 @@ public class Quiz {
     @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<QuizQuestion> questions = new ArrayList<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "teacher_id")
+    private Teacher teacher;
+
     public Quiz() {}
 
     public Quiz(String title, String description, String difficulty) {
@@ -46,6 +51,7 @@ public class Quiz {
     public String getDescription() { return description; }
     public String getDifficulty() { return difficulty; }
     public List<QuizQuestion> getQuestions() { return questions; }
+    public Teacher getTeacher() { return teacher; }
 
     // --- SETTERS ---
     public void setId(Long id) { this.id = id; }
@@ -53,6 +59,7 @@ public class Quiz {
     public void setDescription(String description) { this.description = description; }
     public void setDifficulty(String difficulty) { this.difficulty = difficulty; }
     public void setQuestions(List<QuizQuestion> questions) { this.questions = questions; }
+    public void setTeacher(Teacher teacher) { this.teacher = teacher; }
 
     /**
      * Helper method untuk menambahkan pertanyaan ke kuis.

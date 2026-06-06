@@ -60,12 +60,23 @@ public class QuizView {
         this.controller = controller;
     }
 
+    private final com.doamamah.edutrack.fe.user.EnrollmentService enrollmentService = new com.doamamah.edutrack.fe.user.EnrollmentService();
+
     /**
      * Memuat kuis dari backend (atau cache).
      */
     private List<QuizData> getQuizzes() {
         if (cachedQuizzes == null) {
-            cachedQuizzes = quizService.getAllQuizzes();
+            List<Long> teacherIds = null;
+            if (controller.getCurrentUser() instanceof Teacher teacher) {
+                teacherIds = List.of(teacher.getId());
+            } else if (controller.getCurrentUser() instanceof com.doamamah.edutrack.fe.user.Student student) {
+                teacherIds = enrollmentService.getEnrolledTeacherIds(student.getId());
+                if (teacherIds.isEmpty()) {
+                    teacherIds = List.of(-1L);
+                }
+            }
+            cachedQuizzes = quizService.getAllQuizzes(teacherIds);
         }
         return cachedQuizzes;
     }
@@ -385,6 +396,16 @@ public class QuizView {
         descL.getStyleClass().add("card-description");
         descL.setWrapText(true);
 
+        // Teacher badge (show who created this quiz)
+        HBox teacherRow = new HBox(6);
+        teacherRow.setAlignment(Pos.CENTER_LEFT);
+        if (quiz.getTeacherName() != null && !quiz.getTeacherName().isEmpty()) {
+            Label teacherBadge = new Label("👨‍🏫 " + quiz.getTeacherName());
+            teacherBadge.setStyle("-fx-font-size: 11px; -fx-text-fill: #2563EB; -fx-font-weight: bold; " +
+                    "-fx-background-color: #DBEAFE; -fx-padding: 2 8; -fx-background-radius: 8;");
+            teacherRow.getChildren().add(teacherBadge);
+        }
+
         javafx.scene.control.Separator div = new javafx.scene.control.Separator();
 
         HBox actions = new HBox(8);
@@ -405,7 +426,7 @@ public class QuizView {
         HBox.setHgrow(spc, Priority.ALWAYS);
         actions.getChildren().addAll(quizMeta, spc, startBtn);
 
-        card.getChildren().addAll(top, titleL, descL, div, actions);
+        card.getChildren().addAll(top, titleL, descL, teacherRow, div, actions);
         return card;
     }
 
@@ -820,7 +841,11 @@ public class QuizView {
                 if (isEdit) {
                     result = quizService.updateQuiz(quizToEdit.getId(), title, finalDesc, difficulty, questionDataList);
                 } else {
-                    result = quizService.createQuiz(title, finalDesc, difficulty, questionDataList);
+                    Long currentTeacherId = null;
+                    if (controller.getCurrentUser() instanceof Teacher teacher) {
+                        currentTeacherId = teacher.getId();
+                    }
+                    result = quizService.createQuiz(title, finalDesc, difficulty, questionDataList, currentTeacherId);
                 }
                 Platform.runLater(() -> {
                     btnSave.setDisable(false);

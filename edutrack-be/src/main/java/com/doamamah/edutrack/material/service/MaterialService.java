@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.Optional;
+import com.doamamah.edutrack.auth.model.Teacher;
 
 /**
  * Service layer untuk operasi CRUD materi pembelajaran.
@@ -51,6 +52,33 @@ public class MaterialService {
      */
     public CourseMaterial addMaterial(CourseMaterial material) {
         return materialRepository.save(material);
+    }
+
+    /**
+     * Menambahkan materi baru dengan ownership pengajar.
+     */
+    public CourseMaterial addMaterial(CourseMaterial material, Long teacherId) {
+        if (teacherId != null) {
+            Teacher teacher = (Teacher) userRepository.findById(teacherId)
+                    .orElseThrow(() -> new RuntimeException("Pengajar tidak ditemukan."));
+            material.setTeacher(teacher);
+        }
+        return materialRepository.save(material);
+    }
+
+    /**
+     * Mengambil materi berdasarkan daftar teacher IDs (untuk siswa).
+     */
+    public List<CourseMaterial> getMaterialsByTeacherIds(List<Long> teacherIds) {
+        if (teacherIds == null || teacherIds.isEmpty()) return List.of();
+        return materialRepository.findByTeacherIdIn(teacherIds);
+    }
+
+    /**
+     * Mengambil materi berdasarkan teacher ID (untuk pengajar).
+     */
+    public List<CourseMaterial> getMaterialsByTeacher(Long teacherId) {
+        return materialRepository.findByTeacherId(teacherId);
     }
 
     /**

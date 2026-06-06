@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import com.doamamah.edutrack.auth.model.Teacher;
 
 /**
  * Service layer untuk operasi CRUD kuis.
@@ -51,6 +52,38 @@ public class QuizService {
             }
         }
         return quizRepository.save(quiz);
+    }
+
+    /**
+     * Membuat kuis baru dengan ownership pengajar.
+     */
+    public Quiz createQuiz(Quiz quiz, Long teacherId) {
+        if (quiz.getQuestions() != null) {
+            for (QuizQuestion q : quiz.getQuestions()) {
+                q.setQuiz(quiz);
+            }
+        }
+        if (teacherId != null) {
+            Teacher teacher = (Teacher) userRepository.findById(teacherId)
+                    .orElseThrow(() -> new RuntimeException("Pengajar tidak ditemukan."));
+            quiz.setTeacher(teacher);
+        }
+        return quizRepository.save(quiz);
+    }
+
+    /**
+     * Mengambil kuis berdasarkan daftar teacher IDs (untuk siswa).
+     */
+    public List<Quiz> getQuizzesByTeacherIds(List<Long> teacherIds) {
+        if (teacherIds == null || teacherIds.isEmpty()) return List.of();
+        return quizRepository.findByTeacherIdIn(teacherIds);
+    }
+
+    /**
+     * Mengambil kuis berdasarkan teacher ID (untuk pengajar).
+     */
+    public List<Quiz> getQuizzesByTeacher(Long teacherId) {
+        return quizRepository.findByTeacherId(teacherId);
     }
 
     /**

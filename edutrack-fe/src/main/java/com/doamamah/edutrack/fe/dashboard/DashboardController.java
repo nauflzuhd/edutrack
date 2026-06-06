@@ -9,6 +9,8 @@ import com.doamamah.edutrack.fe.core.SceneManager;
 import com.doamamah.edutrack.fe.material.MaterialView;
 import com.doamamah.edutrack.fe.quiz.QuizView;
 import com.doamamah.edutrack.fe.user.StudentListView;
+import com.doamamah.edutrack.fe.user.TeacherListView;
+import com.doamamah.edutrack.fe.user.ProfileView;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -37,6 +39,8 @@ public class DashboardController implements Initializable {
     @FXML private Button btnQuiz;
 
     @FXML private Button btnStudents;
+    @FXML private Button btnTeachers;
+    @FXML private Button btnProfile;
     @FXML private Button btnLogout;
     @FXML private Label contentTitleLabel;
     @FXML private Label greetingLabel;
@@ -52,6 +56,8 @@ public class DashboardController implements Initializable {
     private MaterialView materialView;
     private QuizView quizView;
     private StudentListView studentListView;
+    private TeacherListView teacherListView;
+    private ProfileView profileView;
 
     public User getCurrentUser() { return currentUser; }
     public MaterialService getMaterialService() { return materialService; }
@@ -67,6 +73,8 @@ public class DashboardController implements Initializable {
         materialView = new MaterialView(this);
         quizView = new QuizView(this);
         studentListView = new StudentListView(this);
+        teacherListView = new TeacherListView(this);
+        profileView = new ProfileView(this);
         showDashboardContent();
     }
 
@@ -86,10 +94,15 @@ public class DashboardController implements Initializable {
 
         // Jika Guru, tampilkan tombol navigasi Daftar Siswa
         if (currentUser instanceof Teacher) {
-            
             if (btnStudents != null) {
                 btnStudents.setVisible(true);
                 btnStudents.setManaged(true);
+            }
+        } else {
+            // Siswa: tampilkan tombol Pengajar
+            if (btnTeachers != null) {
+                btnTeachers.setVisible(true);
+                btnTeachers.setManaged(true);
             }
         }
     }
@@ -106,6 +119,8 @@ public class DashboardController implements Initializable {
         contentArea.getChildren().add(dashboardHomeView.buildContent());
     }
 
+    private final com.doamamah.edutrack.fe.user.EnrollmentService enrollmentService = new com.doamamah.edutrack.fe.user.EnrollmentService();
+
     @FXML
     public void showMaterialsContent() {
         setActiveButton(btnMaterials);
@@ -121,7 +136,16 @@ public class DashboardController implements Initializable {
         contentArea.getChildren().add(loadingBox);
 
         Thread fetchThread = new Thread(() -> {
-            List<CourseMaterial> materials = materialService.getAllMaterials();
+            List<Long> teacherIds = null;
+            if (currentUser instanceof Teacher teacher) {
+                teacherIds = List.of(teacher.getId());
+            } else if (currentUser instanceof com.doamamah.edutrack.fe.user.Student student) {
+                teacherIds = enrollmentService.getEnrolledTeacherIds(student.getId());
+                if (teacherIds.isEmpty()) {
+                    teacherIds = List.of(-1L); // Force empty if no teachers
+                }
+            }
+            List<CourseMaterial> materials = materialService.getAllMaterials(teacherIds);
             Platform.runLater(() -> {
                 contentArea.getChildren().clear();
                 contentArea.getChildren().add(materialView.buildListContent(materials));
@@ -147,6 +171,23 @@ public class DashboardController implements Initializable {
         contentTitleLabel.setText("Daftar Siswa");
         contentArea.getChildren().clear();
         contentArea.getChildren().add(studentListView.buildContent());
+    }
+
+    @FXML
+    public void showTeachersContent() {
+        setActiveButton(btnTeachers);
+        contentTitleLabel.setText("Pengajar");
+        contentArea.getChildren().clear();
+        contentArea.getChildren().add(teacherListView.buildContent());
+    }
+
+    @FXML
+    public void showProfileContent() {
+        setActiveButton(btnProfile);
+        contentTitleLabel.setText("Profil Saya");
+        contentArea.getChildren().clear();
+        profileView = new ProfileView(this); // refresh with latest data
+        contentArea.getChildren().add(profileView.buildContent());
     }
 
     @FXML
@@ -211,6 +252,12 @@ public class DashboardController implements Initializable {
 
         if (btnStudents != null) {
             btnStudents.getStyleClass().remove("nav-btn-active");
+        }
+        if (btnTeachers != null) {
+            btnTeachers.getStyleClass().remove("nav-btn-active");
+        }
+        if (btnProfile != null) {
+            btnProfile.getStyleClass().remove("nav-btn-active");
         }
         if (!activeBtn.getStyleClass().contains("nav-btn-active")) {
             activeBtn.getStyleClass().add("nav-btn-active");

@@ -50,6 +50,7 @@ public class AuthController {
             response.put("fullName", user.getFullName());
             response.put("email", user.getEmail());
             response.put("role", user.getRole());
+            response.put("bio", user.getBio());
 
             // Tambahkan field spesifik berdasarkan tipe user
             if (user instanceof Teacher teacher) {
@@ -105,5 +106,83 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<?> logout() {
         return ResponseEntity.ok(Map.of("message", "Logout berhasil."));
+    }
+
+    /**
+     * GET /api/auth/profile/{id}
+     * Mengambil profil user berdasarkan ID.
+     */
+    @GetMapping("/profile/{id}")
+    public ResponseEntity<?> getProfile(@PathVariable Long id) {
+        try {
+            com.doamamah.edutrack.auth.model.User user = authService.getUserById(id);
+            Map<String, Object> response = new HashMap<>();
+            response.put("id", user.getId());
+            response.put("username", user.getUsername());
+            response.put("fullName", user.getFullName());
+            response.put("email", user.getEmail());
+            response.put("role", user.getRole());
+            response.put("bio", user.getBio());
+
+            if (user instanceof Teacher teacher) {
+                response.put("teacherId", teacher.getTeacherId());
+                response.put("specialization", teacher.getSpecialization());
+            } else if (user instanceof Student student) {
+                response.put("studentId", student.getStudentId());
+            }
+
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    /**
+     * PUT /api/auth/profile/{id}
+     * Update profil user (username, bio, specialization).
+     */
+    @PutMapping("/profile/{id}")
+    public ResponseEntity<?> updateProfile(@PathVariable Long id, @RequestBody Map<String, String> data) {
+        try {
+            com.doamamah.edutrack.auth.model.User user = authService.updateProfile(id, data);
+            Map<String, Object> response = new HashMap<>();
+            response.put("id", user.getId());
+            response.put("username", user.getUsername());
+            response.put("fullName", user.getFullName());
+            response.put("email", user.getEmail());
+            response.put("role", user.getRole());
+            response.put("bio", user.getBio());
+
+            if (user instanceof Teacher teacher) {
+                response.put("specialization", teacher.getSpecialization());
+            }
+
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    /**
+     * GET /api/users/teachers
+     * Mendapatkan daftar semua pengajar.
+     */
+    @GetMapping("/teachers")
+    public ResponseEntity<?> getAllTeachers() {
+        var teachers = authService.getAllTeachers();
+        var result = teachers.stream().map(u -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", u.getId());
+            map.put("fullName", u.getFullName());
+            map.put("username", u.getUsername());
+            map.put("email", u.getEmail());
+            map.put("bio", u.getBio());
+            if (u instanceof Teacher t) {
+                map.put("teacherId", t.getTeacherId());
+                map.put("specialization", t.getSpecialization());
+            }
+            return map;
+        }).toList();
+        return ResponseEntity.ok(result);
     }
 }

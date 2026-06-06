@@ -78,4 +78,41 @@ public class AuthService {
 
         return userRepository.save(newUser);
     }
+
+    /**
+     * Mengambil user berdasarkan ID.
+     */
+    public User getUserById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User tidak ditemukan."));
+    }
+
+    /**
+     * Memperbarui profil pengguna (username, bio, spesialisasi).
+     */
+    public User updateProfile(Long id, Map<String, String> data) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User tidak ditemukan."));
+
+        if (data.containsKey("fullName") && data.get("fullName") != null && !data.get("fullName").isBlank()) {
+            user.setFullName(data.get("fullName"));
+        }
+
+        if (data.containsKey("bio")) {
+            user.setBio(data.get("bio"));
+        }
+
+        if (user instanceof Teacher teacher && data.containsKey("specialization")) {
+            teacher.setSpecialization(data.get("specialization"));
+        }
+
+        return userRepository.save(user);
+    }
+
+    /**
+     * Mengambil daftar semua pengajar.
+     */
+    public java.util.List<User> getAllTeachers() {
+        return userRepository.findAllTeachers();
+    }
 }

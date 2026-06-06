@@ -118,6 +118,11 @@ public class AuthService {
                 user = new Student(id, uname, fullName, email, uname);
             }
 
+            // Parse bio
+            if (jsonResponse.has("bio") && !jsonResponse.get("bio").isJsonNull()) {
+                user.setBio(jsonResponse.get("bio").getAsString());
+            }
+
             return user;
 
         } catch (Exception e) {

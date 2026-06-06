@@ -26,6 +26,9 @@ public abstract class User {
     private String fullName;
     private String email;
 
+    @Column(columnDefinition = "CLOB")
+    private String bio;
+
     // Constructor kosong (diperlukan oleh JPA)
     public User() {}
 
@@ -43,6 +46,7 @@ public abstract class User {
     public String getPassword() { return password; }
     public String getFullName() { return fullName; }
     public String getEmail() { return email; }
+    public String getBio() { return bio; }
 
     /**
      * Mengembalikan nilai kolom discriminator 'role'.
@@ -58,4 +62,5 @@ public abstract class User {
     public void setPassword(String password) { this.password = password; }
     public void setFullName(String fullName) { this.fullName = fullName; }
     public void setEmail(String email) { this.email = email; }
+    public void setBio(String bio) { this.bio = bio; }
 }

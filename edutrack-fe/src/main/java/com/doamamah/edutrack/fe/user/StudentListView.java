@@ -18,7 +18,7 @@ import java.util.List;
 public class StudentListView {
 
     private final DashboardController controller;
-    private final UserService userService = new UserService();
+    private final EnrollmentService enrollmentService = new EnrollmentService();
 
     public StudentListView(DashboardController controller) {
         this.controller = controller;
@@ -47,7 +47,11 @@ public class StudentListView {
         root.getChildren().add(loadingBox);
 
         Thread fetchThread = new Thread(() -> {
-            List<Student> students = userService.getAllStudents();
+            List<Student> fetchedStudents = new java.util.ArrayList<>();
+            if (controller.getCurrentUser() instanceof com.doamamah.edutrack.fe.user.Teacher teacher) {
+                fetchedStudents = enrollmentService.getEnrolledStudents(teacher.getId());
+            }
+            final List<Student> students = fetchedStudents;
             Platform.runLater(() -> {
                 root.getChildren().remove(loadingBox);
                 

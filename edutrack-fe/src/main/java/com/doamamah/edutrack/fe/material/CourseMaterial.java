@@ -23,6 +23,8 @@ public abstract class CourseMaterial {
     private String title;
     private String description;
     private String materialType; // "VIDEO" atau "TEXT"
+    private String teacherName;
+    private Long teacherId;
 
     public CourseMaterial() {}
 
@@ -52,6 +54,12 @@ public abstract class CourseMaterial {
 
     public String getMaterialType() { return materialType; }
     public void setMaterialType(String materialType) { this.materialType = materialType; }
+
+    public String getTeacherName() { return teacherName; }
+    public void setTeacherName(String teacherName) { this.teacherName = teacherName; }
+
+    public Long getTeacherId() { return teacherId; }
+    public void setTeacherId(Long teacherId) { this.teacherId = teacherId; }
 
     /**
      * PILAR OOP: ABSTRACTION

@@ -21,6 +21,7 @@ public abstract class User {
     private String fullName;
     private String email;
     private String role;     // "STUDENT" atau "TEACHER"
+    private String bio;      // Bio/deskripsi profil pengguna
 
     // Constructor kosong
     public User() {}
@@ -56,6 +57,10 @@ public abstract class User {
         return role;
     }
 
+    public String getBio() {
+        return bio;
+    }
+
     // --- SETTERS (dengan validasi ringan) ---
 
     public void setId(Long id) {
@@ -88,6 +93,10 @@ public abstract class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
     }
 
     /**

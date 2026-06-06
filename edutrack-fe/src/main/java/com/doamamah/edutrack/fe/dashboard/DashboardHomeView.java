@@ -79,9 +79,21 @@ public class DashboardHomeView {
 
         // Stats
         java.util.Map<String, Double> stats = controller.getDashboardService().getDashboardStats();
-        int totalMaterials = controller.getMaterialService().getAllMaterials().size();
+        
+        com.doamamah.edutrack.fe.user.EnrollmentService enrollmentService = new com.doamamah.edutrack.fe.user.EnrollmentService();
+        java.util.List<Long> teacherIds = null;
+        if (currentUser instanceof com.doamamah.edutrack.fe.user.Teacher teacher) {
+            teacherIds = java.util.List.of(teacher.getId());
+        } else if (currentUser instanceof com.doamamah.edutrack.fe.user.Student student) {
+            teacherIds = enrollmentService.getEnrolledTeacherIds(student.getId());
+            if (teacherIds.isEmpty()) {
+                teacherIds = java.util.List.of(-1L);
+            }
+        }
+        
+        int totalMaterials = controller.getMaterialService().getAllMaterials(teacherIds).size();
         QuizService quizService = new QuizService();
-        int totalQuizzes = quizService.getAllQuizzes().size();
+        int totalQuizzes = quizService.getAllQuizzes(teacherIds).size();
         
         int totalAttempts = 0;
         double avgScore = 0.0;
@@ -98,10 +110,10 @@ public class DashboardHomeView {
             avgScore = sum / totalAttempts;
         }
 
-        int kuisTersedia = Math.max(0, totalQuizzes - uniqueQuizzes.size());
+        int kuisTersedia = totalQuizzes;
 
         java.util.List<Long> viewedMaterials = controller.getMaterialService().getViewedMaterials(currentUser.getId());
-        int materiTersedia = Math.max(0, totalMaterials - viewedMaterials.size());
+        int materiTersedia = totalMaterials;
 
         HBox statsRow = new HBox(14);
         statsRow.setMaxWidth(Double.MAX_VALUE);
@@ -278,12 +290,28 @@ public class DashboardHomeView {
         }
 
         // Stats
-        java.util.Map<String, Double> stats = controller.getDashboardService().getDashboardStats();
-        int totalMaterials = controller.getMaterialService().getAllMaterials().size();
+        java.util.List<Long> teacherIds = java.util.List.of(currentUser.getId());
+        int totalMaterials = controller.getMaterialService().getAllMaterials(teacherIds).size();
         QuizService qs = new QuizService();
-        int totalQuizzes = qs.getAllQuizzes().size();
-        int totalStudents = stats.getOrDefault("totalStudents", 0.0).intValue();
-        int totalAttempts = stats.getOrDefault("totalQuizAttempts", 0.0).intValue();
+        java.util.List<QuizService.QuizData> teacherQuizzes = qs.getAllQuizzes(teacherIds);
+        int totalQuizzes = teacherQuizzes.size();
+        
+        com.doamamah.edutrack.fe.user.EnrollmentService enrollmentService = new com.doamamah.edutrack.fe.user.EnrollmentService();
+        int totalStudents = enrollmentService.getEnrolledStudents(currentUser.getId()).size();
+
+        java.util.Set<Long> teacherQuizIds = new java.util.HashSet<>();
+        for (QuizService.QuizData q : teacherQuizzes) {
+            teacherQuizIds.add(q.getId());
+        }
+        
+        java.util.List<QuizService.QuizAttemptData> allAttempts = qs.getAllAttempts();
+        java.util.List<QuizService.QuizAttemptData> teacherAttempts = new java.util.ArrayList<>();
+        for (QuizService.QuizAttemptData att : allAttempts) {
+            if (teacherQuizIds.contains(att.getQuizId())) {
+                teacherAttempts.add(att);
+            }
+        }
+        int totalAttempts = teacherAttempts.size();
 
         HBox statsRow = new HBox(14);
         statsRow.setMaxWidth(Double.MAX_VALUE);
@@ -331,17 +359,15 @@ public class DashboardHomeView {
         recentHistoryTitle.getStyleClass().add("section-title");
         recentHistorySection.getChildren().add(recentHistoryTitle);
 
-        QuizService quizService = new QuizService();
-        java.util.List<QuizService.QuizAttemptData> allAttempts = quizService.getAllAttempts();
-
-        if (allAttempts.isEmpty()) {
+        if (teacherAttempts.isEmpty()) {
             Label emptyLbl = new Label("Belum ada aktivitas kuis dari siswa.");
             emptyLbl.setStyle("-fx-text-fill: #9CA3AF; -fx-font-style: italic;");
             recentHistorySection.getChildren().add(emptyLbl);
         } else {
-            int limit = Math.min(4, allAttempts.size());
+            // Sort attempts by date descending (optional, assuming backend doesn't sort or just relying on existing order)
+            int limit = Math.min(4, teacherAttempts.size());
             for (int i = 0; i < limit; i++) {
-                QuizService.QuizAttemptData att = allAttempts.get(i);
+                QuizService.QuizAttemptData att = teacherAttempts.get(i);
                 HBox attRow = new HBox(12);
                 attRow.setAlignment(Pos.CENTER_LEFT);
                 attRow.setPadding(new Insets(10));

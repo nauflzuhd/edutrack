@@ -42,21 +42,36 @@ public class MaterialService {
      *
      * @return List berisi objek CourseMaterial (VideoMaterial atau TextMaterial)
      */
-    public List<CourseMaterial> getAllMaterials() {
+    public List<CourseMaterial> getAllMaterials(List<Long> teacherIds) {
+        // Jika minta data terfilter, selalu fetch ulang
+        if (teacherIds != null && !teacherIds.isEmpty()) {
+            return fetchMaterialsFromBackend(teacherIds);
+        }
+        
         if (cachedMaterials == null) {
-            cachedMaterials = fetchMaterialsFromBackend();
+            cachedMaterials = fetchMaterialsFromBackend(null);
         }
         return cachedMaterials;
+    }
+
+    public List<CourseMaterial> getAllMaterials() {
+        return getAllMaterials(null);
     }
 
     /**
      * Mengambil semua materi dari backend via GET /api/materials.
      * Jika backend tidak tersedia, mengembalikan data dummy untuk demo.
      */
-    private List<CourseMaterial> fetchMaterialsFromBackend() {
+    private List<CourseMaterial> fetchMaterialsFromBackend(List<Long> teacherIds) {
         try {
+            String url = BASE_URL + "/api/materials";
+            if (teacherIds != null && !teacherIds.isEmpty()) {
+                String idsParam = teacherIds.stream().map(String::valueOf).collect(java.util.stream.Collectors.joining(","));
+                url += "?teacherIds=" + idsParam;
+            }
+
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(BASE_URL + "/api/materials"))
+                    .uri(URI.create(url))
                     .header("Accept", "application/json")
                     .GET()
                     .timeout(Duration.ofSeconds(5))
@@ -114,6 +129,10 @@ public class MaterialService {
                     json.addProperty("textContent", tm.getTextContent());
                 }
 
+                if (material.getTeacherId() != null) {
+                    json.addProperty("teacherId", material.getTeacherId());
+                }
+
                 HttpRequest postRequest = HttpRequest.newBuilder()
                         .uri(URI.create(BASE_URL + "/api/materials"))
                         .header("Content-Type", "application/json")
@@ -152,18 +171,26 @@ public class MaterialService {
     private CourseMaterial parseSingleMaterial(JsonObject obj) {
         Long id = obj.has("id") ? obj.get("id").getAsLong() : null;
         String title = obj.has("title") ? obj.get("title").getAsString() : "Tanpa Judul";
-        String desc = obj.has("description") ? obj.get("description").getAsString() : "";
+        String desc = obj.has("description") && !obj.get("description").isJsonNull() ? obj.get("description").getAsString() : "";
         String type = obj.has("type") ? obj.get("type").getAsString() : "TEXT";
+        String teacherName = obj.has("teacherName") && !obj.get("teacherName").isJsonNull()
+                ? obj.get("teacherName").getAsString() : null;
+        Long teacherId = obj.has("teacherId") && !obj.get("teacherId").isJsonNull()
+                ? obj.get("teacherId").getAsLong() : null;
 
+        CourseMaterial material;
         // PILAR OOP: POLYMORPHISM - instansiasi kelas yang tepat berdasarkan tipe
         if ("VIDEO".equalsIgnoreCase(type)) {
-            String url = obj.has("videoUrl") ? obj.get("videoUrl").getAsString() : "";
+            String url = obj.has("videoUrl") && !obj.get("videoUrl").isJsonNull() ? obj.get("videoUrl").getAsString() : "";
             int duration = obj.has("durationMinutes") ? obj.get("durationMinutes").getAsInt() : 0;
-            return new VideoMaterial(id, title, desc, url, duration);
+            material = new VideoMaterial(id, title, desc, url, duration);
         } else {
-            String content = obj.has("textContent") ? obj.get("textContent").getAsString() : "";
-            return new TextMaterial(id, title, desc, content);
+            String content = obj.has("textContent") && !obj.get("textContent").isJsonNull() ? obj.get("textContent").getAsString() : "";
+            material = new TextMaterial(id, title, desc, content);
         }
+        material.setTeacherName(teacherName);
+        material.setTeacherId(teacherId);
+        return material;
     }
 
 

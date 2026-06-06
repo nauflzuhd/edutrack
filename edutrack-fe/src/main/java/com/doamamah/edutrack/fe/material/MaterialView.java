@@ -221,8 +221,8 @@ public class MaterialView {
         statsTitle.getStyleClass().add("section-title");
         statsTitle.setStyle("-fx-font-size: 15px;");
 
-        java.util.Map<String, Double> stats = controller.getDashboardService().getDashboardStats();
-        int totalStudents = stats.getOrDefault("totalStudents", 0.0).intValue();
+        com.doamamah.edutrack.fe.user.EnrollmentService enrollmentService = new com.doamamah.edutrack.fe.user.EnrollmentService();
+        int totalStudents = enrollmentService.getEnrolledStudents(controller.getCurrentUser().getId()).size();
 
         long videoCount = materials.stream().filter(m -> "VIDEO".equals(m.getMaterialType())).count();
         long textCount = materials.stream().filter(m -> "TEXT".equals(m.getMaterialType())).count();
@@ -343,6 +343,16 @@ public class MaterialView {
         descLabel.getStyleClass().add("card-description");
         descLabel.setWrapText(true);
 
+        // Teacher badge (show who created this material)
+        HBox teacherRow = new HBox(6);
+        teacherRow.setAlignment(Pos.CENTER_LEFT);
+        if (material.getTeacherName() != null && !material.getTeacherName().isEmpty()) {
+            Label teacherBadge = new Label("👨‍🏫 " + material.getTeacherName());
+            teacherBadge.setStyle("-fx-font-size: 11px; -fx-text-fill: #2563EB; -fx-font-weight: bold; " +
+                    "-fx-background-color: #DBEAFE; -fx-padding: 2 8; -fx-background-radius: 8;");
+            teacherRow.getChildren().add(teacherBadge);
+        }
+
         // Divider
         javafx.scene.control.Separator divider = new javafx.scene.control.Separator();
 
@@ -403,7 +413,7 @@ public class MaterialView {
             actions.getChildren().addAll(editBtn, deleteBtn);
         }
 
-        card.getChildren().addAll(topRow, titleLabel, descLabel, divider, actions);
+        card.getChildren().addAll(topRow, titleLabel, descLabel, teacherRow, divider, actions);
         return card;
     }
 
@@ -615,6 +625,12 @@ public class MaterialView {
                     return;
                 }
                 material = new TextMaterial(isEdit ? materialToEdit.getId() : null, title, desc, content);
+            }
+
+            // Assign teacher ID if current user is a teacher
+            User currentUser = controller.getCurrentUser();
+            if (currentUser instanceof Teacher teacher) {
+                material.setTeacherId(teacher.getId());
             }
 
             // Save via service
