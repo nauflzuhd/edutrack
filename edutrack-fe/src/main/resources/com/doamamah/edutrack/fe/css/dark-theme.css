@@ -1,0 +1,157 @@
+/* =====================================================================
+   dark-theme.css — EduTrack Dark Mode Override
+   ===================================================================== */
+
+/* Global Backgrounds */
+.root, .login-root, .dashboard-root {
+    -fx-background-color: #121212;
+    -fx-primary-text: #E0E0E0;
+    -fx-secondary-text: #A0A0A0;
+}
+
+/* Containers and Cards */
+.login-left-pane {
+    -fx-background-color: #1E120A;
+    -fx-border-color: #333333;
+}
+
+.left-stat-box, .login-form-card, .sidebar, .sidebar-header, 
+.sidebar-profile, .stat-card, .section-box, .material-card, 
+.material-container, .text-reader-container, .content-header {
+    -fx-background-color: #1E1E1E;
+    -fx-border-color: #333333;
+}
+
+/* Typography Overrides (Dark to Light) */
+.hero-title, .login-form-title, .sidebar-app-name, .profile-name, 
+.content-title, .stat-value, .section-title, .card-title, 
+.material-title, .text-reader-body, .placeholder-title {
+    -fx-text-fill: #E0E0E0;
+}
+
+.hero-subtitle, .login-form-subtitle, .feature-text, .nav-btn, 
+.greeting-label, .banner-subtitle, .stat-label, .progress-info, 
+.card-description, .material-description {
+    -fx-text-fill: #A0A0A0;
+}
+
+.input-label {
+    -fx-text-fill: #C0C0C0;
+}
+
+.sidebar-brand-sub, .stat-unit, .card-type-detail {
+    -fx-text-fill: #808080;
+}
+
+/* Nav Buttons */
+.nav-btn:hover {
+    -fx-background-color: #2A2A2A;
+    -fx-text-fill: #E0E0E0;
+}
+
+.nav-btn:hover .nav-icon {
+    -fx-fill: #E0E0E0;
+}
+
+.nav-btn-active {
+    -fx-background-color: #2A1B0A;
+    -fx-text-fill: #FF7A00;
+}
+
+/* Inputs and Forms */
+.input-field, .combo-box.input-field {
+    -fx-background-color: #2C2C2C;
+    -fx-text-fill: #E0E0E0;
+    -fx-prompt-text-fill: #808080;
+    -fx-border-color: #444444;
+}
+
+.combo-box.input-field .list-cell {
+    -fx-text-fill: #E0E0E0;
+}
+
+.combo-box-popup .list-view {
+    -fx-background-color: #2C2C2C;
+}
+
+.combo-box-popup .list-cell {
+    -fx-text-fill: #E0E0E0;
+}
+
+.combo-box-popup .list-cell:hover {
+    -fx-background-color: #3C3C3C;
+}
+
+/* Specific Accents */
+.dashboard-banner {
+    -fx-background-color: #2A1B0A;
+    -fx-border-color: #3A250E;
+}
+
+.tips-box, .demo-hint-box {
+    -fx-background-color: #2A250A;
+    -fx-border-color: #4A4010;
+}
+
+.demo-hint-title, .tip-title {
+    -fx-text-fill: #FFC300;
+}
+
+.demo-hint-text, .tip-text {
+    -fx-text-fill: #D4A373;
+}
+
+.material-count, .material-meta, .badge-video {
+    -fx-background-color: #2A1B0A;
+    -fx-border-color: #3A250E;
+    -fx-text-fill: #FF7A00;
+}
+
+.badge-text, .word-count-badge {
+    -fx-background-color: #052E20;
+    -fx-border-color: #0A4A34;
+    -fx-text-fill: #10B981;
+}
+
+/* Separators */
+.sidebar-separator, .separator *.line {
+    -fx-background-color: #333333;
+}
+
+/* Buttons (Overrides for secondary/ghost) */
+.btn-secondary {
+    -fx-background-color: #CC9900;
+    -fx-text-fill: #121212;
+}
+
+.btn-secondary:hover {
+    -fx-background-color: #E6B000;
+}
+
+.btn-ghost {
+    -fx-text-fill: #FF9A33;
+}
+
+.btn-ghost:hover {
+    -fx-text-fill: #FF7A00;
+    -fx-background-color: #2A2A2A;
+}
+
+/* SVGs / Icons */
+.nav-icon {
+    -fx-fill: #A0A0A0;
+}
+
+/* Scrollbar tweaks for dark mode */
+.scroll-bar:vertical .thumb {
+    -fx-background-color: #555555;
+}
+.scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #777777;
+}
+
+/* Mini stat box */
+.left-stat-box {
+    -fx-background-color: #2C2C2C;
+    -fx-border-color: #444444;
+}

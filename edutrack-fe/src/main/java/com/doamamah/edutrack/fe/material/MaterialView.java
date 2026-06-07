@@ -193,14 +193,14 @@ public class MaterialView {
 
         // Daftar Materi Tersedia
         Label matListTitle = new Label("Daftar Materi Tersedia");
-        matListTitle.setStyle("-fx-font-weight: bold; -fx-text-fill: #1A1A1A; -fx-font-size: 15px;");
+        matListTitle.setStyle("-fx-font-weight: bold; -fx-text-fill: -fx-primary-text; -fx-font-size: 15px;");
 
         VBox matListContainer = new VBox(10);
         matListContainer.setMaxWidth(Double.MAX_VALUE);
 
         if (materials.isEmpty()) {
             Label emptyLbl = new Label("Belum ada materi yang dibuat.");
-            emptyLbl.setStyle("-fx-text-fill: #6B7280; -fx-font-style: italic;");
+            emptyLbl.setStyle("-fx-text-fill: -fx-secondary-text; -fx-font-style: italic;");
             matListContainer.getChildren().add(emptyLbl);
         } else {
             for (CourseMaterial m : materials) {
@@ -251,9 +251,9 @@ public class MaterialView {
 
         VBox matInfo = new VBox(4);
         Label titleLbl = new Label(m.getTitle());
-        titleLbl.setStyle("-fx-font-weight: bold; -fx-text-fill: #1A1A1A; -fx-font-size: 14px;");
+        titleLbl.setStyle("-fx-font-weight: bold; -fx-text-fill: -fx-primary-text; -fx-font-size: 14px;");
         Label descLbl = new Label(isVideo ? "Materi Video" : "Materi Teks");
-        descLbl.setStyle("-fx-text-fill: #6B7280; -fx-font-size: 12px;");
+        descLbl.setStyle("-fx-text-fill: -fx-secondary-text; -fx-font-size: 12px;");
         matInfo.getChildren().addAll(titleLbl, descLbl);
         HBox.setHgrow(matInfo, Priority.ALWAYS);
 
@@ -295,14 +295,14 @@ public class MaterialView {
         );
 
         Label lbl = new Label(label);
-        lbl.setStyle("-fx-font-size: 11px; -fx-text-fill: #6B7280; -fx-font-weight: bold;");
+        lbl.setStyle("-fx-font-size: 11px; -fx-text-fill: -fx-secondary-text; -fx-font-weight: bold;");
 
         HBox valBox = new HBox(4);
         valBox.setAlignment(Pos.BASELINE_LEFT);
         Label val = new Label(value);
         val.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: " + color + ";");
         Label ut = new Label(unit);
-        ut.setStyle("-fx-font-size: 12px; -fx-text-fill: #9CA3AF;");
+        ut.setStyle("-fx-font-size: 12px; -fx-text-fill: -fx-secondary-text;");
         valBox.getChildren().addAll(val, ut);
 
         box.getChildren().addAll(lbl, valBox);
@@ -518,6 +518,34 @@ public class MaterialView {
             cmbType.setDisable(true);
         }
         VBox typeBox = controller.createInputField("Tipe Materi", cmbType);
+        
+        // File Attachment (Optional)
+        VBox fileBox = new VBox(8);
+        Label fileLabel = new Label("Lampiran File (Opsional)");
+        fileLabel.getStyleClass().add("input-label");
+        HBox fileInputBox = new HBox(10);
+        fileInputBox.setAlignment(Pos.CENTER_LEFT);
+        Button btnChooseFile = new Button("Pilih File");
+        btnChooseFile.getStyleClass().addAll("btn-secondary", "btn-small");
+        Label lblSelectedFile = new Label(isEdit && materialToEdit.getAttachmentFileName() != null ? materialToEdit.getAttachmentFileName() : "Belum ada file yang dipilih");
+        lblSelectedFile.setStyle("-fx-text-fill: -fx-secondary-text; -fx-font-style: italic;");
+        
+        // Variable to hold the selected file
+        java.io.File[] selectedFileHolder = new java.io.File[1];
+        
+        btnChooseFile.setOnAction(e -> {
+            javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
+            fileChooser.setTitle("Pilih File Lampiran");
+            java.io.File file = fileChooser.showOpenDialog(btnChooseFile.getScene().getWindow());
+            if (file != null) {
+                selectedFileHolder[0] = file;
+                lblSelectedFile.setText(file.getName());
+                lblSelectedFile.setStyle("-fx-text-fill: -fx-primary-text;");
+            }
+        });
+        
+        fileInputBox.getChildren().addAll(btnChooseFile, lblSelectedFile);
+        fileBox.getChildren().addAll(fileLabel, fileInputBox);
 
         // Dynamic Form Fields Container
         VBox dynamicContainer = new VBox(16);
@@ -635,9 +663,9 @@ public class MaterialView {
 
             // Save via service
             if (isEdit) {
-                controller.getMaterialService().updateMaterial(material);
+                controller.getMaterialService().updateMaterial(material, selectedFileHolder[0]);
             } else {
-                controller.getMaterialService().addMaterial(material);
+                controller.getMaterialService().addMaterial(material, selectedFileHolder[0]);
             }
 
             // Success notification alert
@@ -653,7 +681,7 @@ public class MaterialView {
         });
 
         buttonRow.getChildren().addAll(btnCancel, btnSave);
-        formCard.getChildren().addAll(titleBox, descBox, typeBox, dynamicContainer, errorMsg, buttonRow);
+        formCard.getChildren().addAll(titleBox, descBox, typeBox, dynamicContainer, fileBox, errorMsg, buttonRow);
         root.getChildren().addAll(headerBox, formCard);
         return root;
     }

@@ -42,6 +42,7 @@ public class DashboardController implements Initializable {
     @FXML private Button btnTeachers;
     @FXML private Button btnProfile;
     @FXML private Button btnLogout;
+    @FXML private ToggleButton btnDarkMode;
     @FXML private Label contentTitleLabel;
     @FXML private Label greetingLabel;
     @FXML private VBox contentArea;
@@ -206,6 +207,26 @@ public class DashboardController implements Initializable {
                     SceneManager.getInstance().showLogin();
                 });
             }).start();
+        }
+    }
+
+    private boolean isDarkMode = false;
+
+    @FXML
+    public void handleToggleDarkMode() {
+        if (btnDarkMode == null || btnDarkMode.getScene() == null) return;
+        
+        isDarkMode = btnDarkMode.isSelected();
+        String darkThemeCss = getClass().getResource("/com/doamamah/edutrack/fe/css/dark-theme.css").toExternalForm();
+        
+        if (isDarkMode) {
+            btnDarkMode.setText("Tema Terang");
+            if (!btnDarkMode.getScene().getStylesheets().contains(darkThemeCss)) {
+                btnDarkMode.getScene().getStylesheets().add(darkThemeCss);
+            }
+        } else {
+            btnDarkMode.setText("Tema Gelap");
+            btnDarkMode.getScene().getStylesheets().remove(darkThemeCss);
         }
     }
 

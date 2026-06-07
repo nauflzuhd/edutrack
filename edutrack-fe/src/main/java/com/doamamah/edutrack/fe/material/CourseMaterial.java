@@ -25,6 +25,10 @@ public abstract class CourseMaterial {
     private String materialType; // "VIDEO" atau "TEXT"
     private String teacherName;
     private Long teacherId;
+    
+    // Attachment fields
+    private String attachmentFileName;
+    private String attachmentUrl;
 
     public CourseMaterial() {}
 
@@ -60,6 +64,12 @@ public abstract class CourseMaterial {
 
     public Long getTeacherId() { return teacherId; }
     public void setTeacherId(Long teacherId) { this.teacherId = teacherId; }
+
+    public String getAttachmentFileName() { return attachmentFileName; }
+    public void setAttachmentFileName(String attachmentFileName) { this.attachmentFileName = attachmentFileName; }
+
+    public String getAttachmentUrl() { return attachmentUrl; }
+    public void setAttachmentUrl(String attachmentUrl) { this.attachmentUrl = attachmentUrl; }
 
     /**
      * PILAR OOP: ABSTRACTION

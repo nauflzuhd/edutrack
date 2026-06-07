@@ -75,6 +75,19 @@ public class TextMaterial extends CourseMaterial {
         wordCountBadge.getStyleClass().add("word-count-badge");
         metaRow.getChildren().addAll(typeBadge, wordCountBadge);
 
+        if (getAttachmentUrl() != null && !getAttachmentUrl().isEmpty()) {
+            javafx.scene.control.Button btnDownload = new javafx.scene.control.Button("Unduh Lampiran: " + getAttachmentFileName());
+            btnDownload.setStyle("-fx-background-color: #3B82F6; -fx-text-fill: white; -fx-cursor: hand; -fx-font-size: 11px;");
+            btnDownload.setOnAction(e -> {
+                try {
+                    java.awt.Desktop.getDesktop().browse(new java.net.URI(getAttachmentUrl()));
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            });
+            metaRow.getChildren().add(btnDownload);
+        }
+
         headerBox.getChildren().addAll(titleLabel, metaRow);
 
         // Deskripsi Singkat

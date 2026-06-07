@@ -164,7 +164,7 @@ public class DashboardHomeView {
 
         if (studentAttempts.isEmpty()) {
             Label emptyLbl = new Label("Belum ada kuis yang dikerjakan.");
-            emptyLbl.setStyle("-fx-text-fill: #9CA3AF; -fx-font-style: italic;");
+            emptyLbl.setStyle("-fx-text-fill: -fx-secondary-text; -fx-font-style: italic;");
             historySection.getChildren().add(emptyLbl);
         } else {
             int limit = Math.min(3, studentAttempts.size());
@@ -180,9 +180,9 @@ public class DashboardHomeView {
                 
                 VBox textInfo = new VBox(2);
                 Label titleLbl = new Label(att.getQuizTitle());
-                titleLbl.setStyle("-fx-font-weight: bold; -fx-text-fill: #1F2937;");
+                titleLbl.setStyle("-fx-font-weight: bold; -fx-text-fill: -fx-primary-text;");
                 Label dateLbl = new Label(att.getAttemptDate());
-                dateLbl.setStyle("-fx-font-size: 11px; -fx-text-fill: #6B7280;");
+                dateLbl.setStyle("-fx-font-size: 11px; -fx-text-fill: -fx-secondary-text;");
                 textInfo.getChildren().addAll(titleLbl, dateLbl);
                 
                 Region sp2 = new Region();
@@ -336,7 +336,7 @@ public class DashboardHomeView {
         Label metricVal = new Label(String.valueOf(totalAttempts));
         metricVal.setStyle("-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: #FF7A00;");
         Label metricLbl = new Label("Total Pengerjaan Kuis");
-        metricLbl.setStyle("-fx-text-fill: #6B7280; -fx-font-size: 14px;");
+        metricLbl.setStyle("-fx-text-fill: -fx-secondary-text; -fx-font-size: 14px;");
         metricBox.getChildren().addAll(metricVal, metricLbl);
 
         javafx.scene.control.Separator vSep = new javafx.scene.control.Separator();
@@ -344,7 +344,7 @@ public class DashboardHomeView {
 
         Label activityDesc = new Label("Siswa secara aktif berinteraksi dengan kuis yang Anda sediakan. Anda bisa memantau detail pengerjaan pada daftar aktivitas terbaru di bawah ini.");
         activityDesc.setWrapText(true);
-        activityDesc.setStyle("-fx-font-size: 14px; -fx-text-fill: #4B5563; -fx-line-spacing: 4px;");
+        activityDesc.setStyle("-fx-font-size: 14px; -fx-text-fill: -fx-secondary-text; -fx-line-spacing: 4px;");
         HBox.setHgrow(activityDesc, Priority.ALWAYS);
 
         activityContent.getChildren().addAll(metricBox, vSep, activityDesc);
@@ -361,7 +361,7 @@ public class DashboardHomeView {
 
         if (teacherAttempts.isEmpty()) {
             Label emptyLbl = new Label("Belum ada aktivitas kuis dari siswa.");
-            emptyLbl.setStyle("-fx-text-fill: #9CA3AF; -fx-font-style: italic;");
+            emptyLbl.setStyle("-fx-text-fill: -fx-secondary-text; -fx-font-style: italic;");
             recentHistorySection.getChildren().add(emptyLbl);
         } else {
             // Sort attempts by date descending (optional, assuming backend doesn't sort or just relying on existing order)
@@ -378,9 +378,9 @@ public class DashboardHomeView {
                 
                 VBox textInfo = new VBox(2);
                 Label nameLbl = new Label(att.getStudentName() + " mengerjakan " + att.getQuizTitle());
-                nameLbl.setStyle("-fx-font-weight: bold; -fx-text-fill: #1F2937;");
+                nameLbl.setStyle("-fx-font-weight: bold; -fx-text-fill: -fx-primary-text;");
                 Label dateLbl = new Label(att.getAttemptDate());
-                dateLbl.setStyle("-fx-font-size: 11px; -fx-text-fill: #6B7280;");
+                dateLbl.setStyle("-fx-font-size: 11px; -fx-text-fill: -fx-secondary-text;");
                 textInfo.getChildren().addAll(nameLbl, dateLbl);
                 
                 Region sp2 = new Region();

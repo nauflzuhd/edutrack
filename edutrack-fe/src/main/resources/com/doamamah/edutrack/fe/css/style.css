@@ -18,6 +18,8 @@
     -fx-font-family: "Segoe UI", "Helvetica Neue", "Arial", sans-serif;
     -fx-font-size: 14px;
     -fx-background-color: #FAF8F3;
+    -fx-primary-text: #1A1A1A;
+    -fx-secondary-text: #6B7280;
 }
 
 /* =====================================================================

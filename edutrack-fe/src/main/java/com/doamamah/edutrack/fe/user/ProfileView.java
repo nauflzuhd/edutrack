@@ -61,7 +61,7 @@ public class ProfileView {
 
         // Name
         Label nameLabel = new Label(currentUser.getFullName() != null ? currentUser.getFullName() : currentUser.getUsername());
-        nameLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1F2937;");
+        nameLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: -fx-primary-text;");
 
         // Role badge
         Label roleLabel = new Label(currentUser instanceof Teacher ? "👨‍🏫 Pengajar" : "🎓 Siswa");
@@ -89,11 +89,11 @@ public class ProfileView {
         // Bio
         VBox bioSection = new VBox(4);
         Label bioTitle = new Label("Bio");
-        bioTitle.setStyle("-fx-font-size: 12px; -fx-text-fill: #6B7280; -fx-font-weight: bold;");
+        bioTitle.setStyle("-fx-font-size: 12px; -fx-text-fill: -fx-secondary-text; -fx-font-weight: bold;");
         Label bioLabel = new Label(currentUser.getBio() != null && !currentUser.getBio().isEmpty()
                 ? currentUser.getBio() : "Belum ada bio.");
         bioLabel.setWrapText(true);
-        bioLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #374151; -fx-font-style: italic;");
+        bioLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: -fx-primary-text; -fx-font-style: italic;");
         bioSection.getChildren().addAll(bioTitle, bioLabel);
 
         profileCard.getChildren().addAll(avatarPane, nameLabel, roleLabel, sep1, infoGrid, bioSection);
@@ -107,7 +107,7 @@ public class ProfileView {
         HBox.setHgrow(editCard, Priority.ALWAYS);
 
         Label editTitle = new Label("✏️  Edit Profil");
-        editTitle.setStyle("-fx-font-size: 17px; -fx-font-weight: bold; -fx-text-fill: #1F2937;");
+        editTitle.setStyle("-fx-font-size: 17px; -fx-font-weight: bold; -fx-text-fill: -fx-primary-text;");
 
         // Full Name field
         VBox fullNameBox = new VBox(6);
@@ -210,9 +210,9 @@ public class ProfileView {
 
     private void addInfoRow(GridPane grid, int row, String label, String value) {
         Label lbl = new Label(label);
-        lbl.setStyle("-fx-font-size: 12px; -fx-text-fill: #6B7280; -fx-font-weight: bold;");
+        lbl.setStyle("-fx-font-size: 12px; -fx-text-fill: -fx-secondary-text; -fx-font-weight: bold;");
         Label val = new Label(value);
-        val.setStyle("-fx-font-size: 13px; -fx-text-fill: #374151;");
+        val.setStyle("-fx-font-size: 13px; -fx-text-fill: -fx-primary-text;");
         grid.add(lbl, 0, row);
         grid.add(val, 1, row);
     }

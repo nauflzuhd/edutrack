@@ -150,7 +150,7 @@ public class TeacherListView {
         if (teacher.getBio() != null && !teacher.getBio().isEmpty()) {
             Label bioLabel = new Label(teacher.getBio());
             bioLabel.setWrapText(true);
-            bioLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #4B5563; -fx-font-style: italic;");
+            bioLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: -fx-secondary-text; -fx-font-style: italic;");
             bioLabel.setMaxHeight(60);
             infoBox.getChildren().add(bioLabel);
         }
@@ -158,11 +158,11 @@ public class TeacherListView {
         // Stats
         long studentCount = enrollmentService.getStudentCount(teacher.getId());
         Label statsLabel = new Label("👥 " + studentCount + " siswa terdaftar");
-        statsLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #6B7280;");
+        statsLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: -fx-secondary-text;");
         infoBox.getChildren().add(statsLabel);
 
         Label emailLabel = new Label("✉ " + teacher.getEmail());
-        emailLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #6B7280;");
+        emailLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: -fx-secondary-text;");
         infoBox.getChildren().add(emailLabel);
 
         // Action button

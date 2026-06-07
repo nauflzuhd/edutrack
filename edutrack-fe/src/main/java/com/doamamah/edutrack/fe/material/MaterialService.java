@@ -94,8 +94,9 @@ public class MaterialService {
      * Menambahkan materi baru ke cache lokal, lalu mencoba mengirimkannya ke backend.
      *
      * @param material Materi baru yang akan ditambahkan
+     * @param fileToUpload File attachment (opsional)
      */
-    public void addMaterial(CourseMaterial material) {
+    public void addMaterial(CourseMaterial material, java.io.File fileToUpload) {
         if (cachedMaterials == null) {
             getAllMaterials();
         }
@@ -115,6 +116,14 @@ public class MaterialService {
         // Kirim POST request ke backend secara asynchronous agar tidak memblokir UI thread
         new Thread(() -> {
             try {
+                if (fileToUpload != null) {
+                    String url = uploadFile(fileToUpload);
+                    if (url != null) {
+                        material.setAttachmentUrl(url);
+                        material.setAttachmentFileName(fileToUpload.getName());
+                    }
+                }
+
                 JsonObject json = new JsonObject();
                 json.addProperty("title", material.getTitle());
                 json.addProperty("description", material.getDescription());
@@ -131,6 +140,11 @@ public class MaterialService {
 
                 if (material.getTeacherId() != null) {
                     json.addProperty("teacherId", material.getTeacherId());
+                }
+                
+                if (material.getAttachmentFileName() != null) {
+                    json.addProperty("attachmentFileName", material.getAttachmentFileName());
+                    json.addProperty("attachmentUrl", material.getAttachmentUrl());
                 }
 
                 HttpRequest postRequest = HttpRequest.newBuilder()
@@ -177,6 +191,11 @@ public class MaterialService {
                 ? obj.get("teacherName").getAsString() : null;
         Long teacherId = obj.has("teacherId") && !obj.get("teacherId").isJsonNull()
                 ? obj.get("teacherId").getAsLong() : null;
+        
+        String attachmentFileName = obj.has("attachmentFileName") && !obj.get("attachmentFileName").isJsonNull()
+                ? obj.get("attachmentFileName").getAsString() : null;
+        String attachmentUrl = obj.has("attachmentUrl") && !obj.get("attachmentUrl").isJsonNull()
+                ? obj.get("attachmentUrl").getAsString() : null;
 
         CourseMaterial material;
         // PILAR OOP: POLYMORPHISM - instansiasi kelas yang tepat berdasarkan tipe
@@ -190,6 +209,8 @@ public class MaterialService {
         }
         material.setTeacherName(teacherName);
         material.setTeacherId(teacherId);
+        material.setAttachmentFileName(attachmentFileName);
+        material.setAttachmentUrl(attachmentUrl);
         return material;
     }
 
@@ -199,8 +220,9 @@ public class MaterialService {
      * Memperbarui materi yang sudah ada dalam cache lokal dan mengirimkan request ke backend.
      *
      * @param material Materi yang telah diedit
+     * @param fileToUpload File attachment baru (opsional)
      */
-    public void updateMaterial(CourseMaterial material) {
+    public void updateMaterial(CourseMaterial material, java.io.File fileToUpload) {
         if (cachedMaterials == null) {
             getAllMaterials();
         }
@@ -214,6 +236,14 @@ public class MaterialService {
         // Kirim PUT request ke backend secara asynchronous
         new Thread(() -> {
             try {
+                if (fileToUpload != null) {
+                    String url = uploadFile(fileToUpload);
+                    if (url != null) {
+                        material.setAttachmentUrl(url);
+                        material.setAttachmentFileName(fileToUpload.getName());
+                    }
+                }
+
                 JsonObject json = new JsonObject();
                 json.addProperty("title", material.getTitle());
                 json.addProperty("description", material.getDescription());
@@ -226,6 +256,11 @@ public class MaterialService {
                 } else if (material instanceof TextMaterial) {
                     TextMaterial tm = (TextMaterial) material;
                     json.addProperty("textContent", tm.getTextContent());
+                }
+                
+                if (material.getAttachmentFileName() != null) {
+                    json.addProperty("attachmentFileName", material.getAttachmentFileName());
+                    json.addProperty("attachmentUrl", material.getAttachmentUrl());
                 }
 
                 HttpRequest putRequest = HttpRequest.newBuilder()
@@ -314,5 +349,50 @@ public class MaterialService {
             System.err.println("Gagal mengambil progress materi: " + e.getMessage());
         }
         return viewedIds;
+    }
+
+    /**
+     * Mengunggah file attachment ke backend menggunakan multipart/form-data.
+     * Mengembalikan URL file yang diunggah.
+     */
+    public String uploadFile(java.io.File file) {
+        try {
+            String boundary = "---EdutrackBoundary" + System.currentTimeMillis();
+
+            java.util.List<byte[]> byteArrays = new java.util.ArrayList<>();
+            String header = "--" + boundary + "\r\n" +
+                    "Content-Disposition: form-data; name=\"file\"; filename=\"" + file.getName() + "\"\r\n" +
+                    "Content-Type: application/octet-stream\r\n\r\n";
+            byteArrays.add(header.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            byteArrays.add(java.nio.file.Files.readAllBytes(file.toPath()));
+            byteArrays.add(("\r\n--" + boundary + "--\r\n").getBytes(java.nio.charset.StandardCharsets.UTF_8));
+
+            int totalLen = 0;
+            for (byte[] b : byteArrays) totalLen += b.length;
+            byte[] body = new byte[totalLen];
+            int currentPos = 0;
+            for (byte[] b : byteArrays) {
+                System.arraycopy(b, 0, body, currentPos, b.length);
+                currentPos += b.length;
+            }
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(BASE_URL + "/api/materials/upload"))
+                    .header("Content-Type", "multipart/form-data; boundary=" + boundary)
+                    .POST(HttpRequest.BodyPublishers.ofByteArray(body))
+                    .timeout(Duration.ofSeconds(60))
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 200) {
+                JsonObject jsonResponse = gson.fromJson(response.body(), JsonObject.class);
+                return jsonResponse.get("fileUrl").getAsString();
+            } else {
+                System.err.println("Gagal upload file, status: " + response.statusCode());
+            }
+        } catch (Exception e) {
+            System.err.println("Error saat upload file: " + e.getMessage());
+        }
+        return null;
     }
 }

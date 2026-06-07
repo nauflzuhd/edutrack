@@ -260,7 +260,7 @@ public class QuizView {
 
         // Daftar Kuis Tersedia
         Label quizzesTitle = new Label("Daftar Kuis Tersedia");
-        quizzesTitle.setStyle("-fx-font-weight: bold; -fx-text-fill: #1A1A1A; -fx-font-size: 15px;");
+        quizzesTitle.setStyle("-fx-font-weight: bold; -fx-text-fill: -fx-primary-text; -fx-font-size: 15px;");
 
         // Loading indicator
         ProgressIndicator loading = new ProgressIndicator();
@@ -273,16 +273,30 @@ public class QuizView {
         quizzesListContainer.getChildren().add(loadingRow);
 
         // Student Results Container
+        HBox resultsTitleRow = new HBox(12);
+        resultsTitleRow.setAlignment(Pos.CENTER_LEFT);
+        resultsTitleRow.setPadding(new Insets(10, 0, 0, 0));
+        
         Label resultsTitle = new Label("Hasil Pengerjaan Siswa");
-        resultsTitle.setStyle("-fx-font-weight: bold; -fx-text-fill: #1A1A1A; -fx-font-size: 15px; -fx-padding: 10px 0 0 0;");
+        resultsTitle.setStyle("-fx-font-weight: bold; -fx-text-fill: -fx-primary-text; -fx-font-size: 15px;");
+        
+        Region rSpacer = new Region();
+        HBox.setHgrow(rSpacer, Priority.ALWAYS);
+        
+        Button btnExportResults = new Button("Export Nilai");
+        btnExportResults.getStyleClass().addAll("btn-secondary", "btn-small");
+        btnExportResults.setStyle("-fx-background-color: #059669; -fx-text-fill: white;");
+        btnExportResults.setDisable(true); // di-enable setelah data dimuat
+        
+        resultsTitleRow.getChildren().addAll(resultsTitle, rSpacer, btnExportResults);
 
         VBox resultsContainer = new VBox(12);
         resultsContainer.setMaxWidth(Double.MAX_VALUE);
         Label emptyResultsLbl = new Label("Belum ada data pengerjaan kuis siswa.");
-        emptyResultsLbl.setStyle("-fx-text-fill: #6B7280; -fx-font-style: italic;");
+        emptyResultsLbl.setStyle("-fx-text-fill: -fx-secondary-text; -fx-font-style: italic;");
         resultsContainer.getChildren().add(emptyResultsLbl);
 
-        leftColumn.getChildren().addAll(headerBox, quizzesTitle, quizzesListContainer, resultsTitle, resultsContainer);
+        leftColumn.getChildren().addAll(headerBox, quizzesTitle, quizzesListContainer, resultsTitleRow, resultsContainer);
 
         // Right side: Quiz Summary Stats
         VBox rightColumn = new VBox(16);
@@ -315,7 +329,7 @@ public class QuizView {
                 quizzesListContainer.getChildren().clear();
                 if (quizzes.isEmpty()) {
                     Label emptyLbl = new Label("Belum ada kuis yang dibuat.");
-                    emptyLbl.setStyle("-fx-text-fill: #6B7280; -fx-font-style: italic;");
+                    emptyLbl.setStyle("-fx-text-fill: -fx-secondary-text; -fx-font-style: italic;");
                     quizzesListContainer.getChildren().add(emptyLbl);
                 } else {
                     for (QuizData q : quizzes) {
@@ -335,6 +349,8 @@ public class QuizView {
                             attempt.getAttemptDate()
                         ));
                     }
+                    btnExportResults.setDisable(false);
+                    btnExportResults.setOnAction(e -> exportQuizResultsToCsv(attempts, btnExportResults.getScene().getWindow()));
                 }
 
                 // Update Stats
@@ -441,10 +457,10 @@ public class QuizView {
 
         VBox quizInfo = new VBox(4);
         Label titleLbl = new Label(q.getTitle());
-        titleLbl.setStyle("-fx-font-weight: bold; -fx-text-fill: #1A1A1A; -fx-font-size: 14px;");
+        titleLbl.setStyle("-fx-font-weight: bold; -fx-text-fill: -fx-primary-text; -fx-font-size: 14px;");
         int qCount = q.getQuestions() != null ? q.getQuestions().size() : 0;
         Label descLbl = new Label(qCount + " soal  ·  Tingkat: " + q.getDifficulty());
-        descLbl.setStyle("-fx-text-fill: #6B7280; -fx-font-size: 12px;");
+        descLbl.setStyle("-fx-text-fill: -fx-secondary-text; -fx-font-size: 12px;");
         quizInfo.getChildren().addAll(titleLbl, descLbl);
         HBox.setHgrow(quizInfo, Priority.ALWAYS);
 
@@ -571,9 +587,9 @@ public class QuizView {
 
         VBox studentInfo = new VBox(4);
         Label nameLbl = new Label(studentName);
-        nameLbl.setStyle("-fx-font-weight: bold; -fx-text-fill: #1A1A1A; -fx-font-size: 14px;");
+        nameLbl.setStyle("-fx-font-weight: bold; -fx-text-fill: -fx-primary-text; -fx-font-size: 14px;");
         Label quizLbl = new Label(quizName + "  ·  " + date);
-        quizLbl.setStyle("-fx-text-fill: #6B7280; -fx-font-size: 12px;");
+        quizLbl.setStyle("-fx-text-fill: -fx-secondary-text; -fx-font-size: 12px;");
         studentInfo.getChildren().addAll(nameLbl, quizLbl);
         HBox.setHgrow(studentInfo, Priority.ALWAYS);
 
@@ -602,18 +618,53 @@ public class QuizView {
         );
 
         Label lbl = new Label(label);
-        lbl.setStyle("-fx-font-size: 11px; -fx-text-fill: #6B7280; -fx-font-weight: bold;");
+        lbl.setStyle("-fx-font-size: 11px; -fx-text-fill: -fx-secondary-text; -fx-font-weight: bold;");
 
         HBox valBox = new HBox(4);
         valBox.setAlignment(Pos.BASELINE_LEFT);
         Label val = new Label(value);
         val.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: " + color + ";");
         Label ut = new Label(unit);
-        ut.setStyle("-fx-font-size: 12px; -fx-text-fill: #9CA3AF;");
+        ut.setStyle("-fx-font-size: 12px; -fx-text-fill: -fx-secondary-text;");
         valBox.getChildren().addAll(val, ut);
 
         box.getChildren().addAll(lbl, valBox);
         return box;
+    }
+
+    private void exportQuizResultsToCsv(List<QuizService.QuizAttemptData> attempts, javafx.stage.Window ownerWindow) {
+        javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
+        fileChooser.setTitle("Simpan Data Nilai Kuis");
+        fileChooser.getExtensionFilters().add(new javafx.stage.FileChooser.ExtensionFilter("CSV Files", "*.csv"));
+        fileChooser.setInitialFileName("nilai_kuis.csv");
+        
+        java.io.File file = fileChooser.showSaveDialog(ownerWindow);
+        if (file != null) {
+            try (java.io.PrintWriter writer = new java.io.PrintWriter(new java.io.FileWriter(file))) {
+                writer.println("Nama Siswa,Judul Kuis,Skor,Tanggal");
+                for (QuizService.QuizAttemptData att : attempts) {
+                    writer.printf("\"%s\",\"%s\",%d,\"%s\"%n",
+                            att.getStudentName(),
+                            att.getQuizTitle(),
+                            att.getScore(),
+                            att.getAttemptDate());
+                }
+                controller.showCustomAlert(
+                    javafx.scene.control.Alert.AlertType.INFORMATION,
+                    "Ekspor Berhasil",
+                    "Data Berhasil Disimpan",
+                    "Data nilai kuis telah diekspor ke: " + file.getAbsolutePath()
+                );
+            } catch (java.io.IOException ex) {
+                System.err.println("Gagal mengekspor data: " + ex.getMessage());
+                controller.showCustomAlert(
+                    javafx.scene.control.Alert.AlertType.ERROR,
+                    "Ekspor Gagal",
+                    "Terjadi kesalahan saat menyimpan",
+                    "Gagal menulis file: " + ex.getMessage()
+                );
+            }
+        }
     }
 
     // =====================================================================
@@ -877,7 +928,7 @@ public class QuizView {
         HBox row = new HBox(8);
         row.setAlignment(Pos.CENTER_LEFT);
         Label lbl = new Label(letter + ".");
-        lbl.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #4B5563; -fx-min-width: 20px;");
+        lbl.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: -fx-secondary-text; -fx-min-width: 20px;");
         field.getStyleClass().add("input-field");
         field.setPromptText("Opsi jawaban " + letter);
         HBox.setHgrow(field, Priority.ALWAYS);
@@ -1008,7 +1059,7 @@ public class QuizView {
         }
 
         Label quizTitleLabel = new Label(activeQuizTitle);
-        quizTitleLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #6B7280;");
+        quizTitleLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: -fx-secondary-text;");
 
         Region spacerTop = new Region();
         HBox.setHgrow(spacerTop, Priority.ALWAYS);
@@ -1066,10 +1117,10 @@ public class QuizView {
 
         VBox questionBox = new VBox(12);
         Label qNumLabel = new Label("PERTANYAAN " + (currentQuestionIndex + 1));
-        qNumLabel.setStyle("-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #9CA3AF; -fx-letter-spacing: 1.5;");
+        qNumLabel.setStyle("-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: -fx-secondary-text; -fx-letter-spacing: 1.5;");
 
         Label qTextLabel = new Label(q.question);
-        qTextLabel.setStyle("-fx-font-size: 17px; -fx-font-weight: bold; -fx-text-fill: #1A1A1A;");
+        qTextLabel.setStyle("-fx-font-size: 17px; -fx-font-weight: bold; -fx-text-fill: -fx-primary-text;");
         qTextLabel.setWrapText(true);
         qTextLabel.setMaxWidth(700);
 
@@ -1104,7 +1155,7 @@ public class QuizView {
                 "-fx-background-radius: 50%;"
                 :
                 "-fx-background-color: #FAF8F3; " +
-                "-fx-text-fill: #6B7280; " +
+                "-fx-text-fill: -fx-secondary-text; " +
                 "-fx-font-weight: bold; " +
                 "-fx-font-size: 13px; " +
                 "-fx-min-width: 28px; -fx-min-height: 28px; " +
@@ -1115,7 +1166,7 @@ public class QuizView {
             );
 
             Label optionLabel = new Label(optionText);
-            optionLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #374151;");
+            optionLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: -fx-primary-text;");
             optionLabel.setWrapText(true);
             HBox.setHgrow(optionLabel, Priority.ALWAYS);
 
@@ -1182,7 +1233,7 @@ public class QuizView {
                         Label otherLetterBadge = (Label)((HBox)optionCards[j].getChildren().get(0)).getChildren().get(0);
                         otherLetterBadge.setStyle(
                             "-fx-background-color: #FAF8F3; " +
-                            "-fx-text-fill: #6B7280; " +
+                            "-fx-text-fill: -fx-secondary-text; " +
                             "-fx-font-weight: bold; " +
                             "-fx-font-size: 13px; " +
                             "-fx-min-width: 28px; -fx-min-height: 28px; " +
@@ -1307,7 +1358,7 @@ public class QuizView {
         VBox scoreBox = new VBox(4);
         scoreBox.setAlignment(Pos.CENTER);
         Label scoreTitle = new Label("SKOR AKHIR KAMU");
-        scoreTitle.setStyle("-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #9CA3AF; -fx-letter-spacing: 1.5;");
+        scoreTitle.setStyle("-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: -fx-secondary-text; -fx-letter-spacing: 1.5;");
 
         Label scoreLabel = new Label(score + " / 100");
         scoreLabel.setStyle("-fx-font-size: 44px; -fx-font-weight: bold; -fx-text-fill: " + (score >= 60 ? "#059669" : "#D97706") + ";");
@@ -1320,7 +1371,7 @@ public class QuizView {
         scoreBar.setStyle("-fx-accent: " + (score >= 60 ? "#059669" : "#D97706") + ";");
 
         Label commentLabel = new Label();
-        commentLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #6B7280; -fx-text-alignment: center;");
+        commentLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: -fx-secondary-text; -fx-text-alignment: center;");
         commentLabel.setWrapText(true);
         commentLabel.setMaxWidth(400);
 

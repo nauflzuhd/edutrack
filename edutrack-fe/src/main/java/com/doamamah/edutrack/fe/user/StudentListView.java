@@ -36,7 +36,13 @@ public class StudentListView {
         sectionLabel.getStyleClass().add("section-title");
         Region sp = new Region();
         HBox.setHgrow(sp, Priority.ALWAYS);
-        header.getChildren().addAll(sectionLabel, sp);
+        
+        javafx.scene.control.Button btnExport = new javafx.scene.control.Button("Export ke Excel");
+        btnExport.getStyleClass().addAll("btn-secondary", "btn-small");
+        btnExport.setStyle("-fx-background-color: #059669; -fx-text-fill: white;");
+        btnExport.setDisable(true); // Akan di-enable setelah data dimuat
+        
+        header.getChildren().addAll(sectionLabel, sp, btnExport);
         root.getChildren().add(header);
 
         // Loading
@@ -75,6 +81,10 @@ public class StudentListView {
                     Label countLabel = new Label("Total " + students.size() + " siswa");
                     countLabel.getStyleClass().add("material-count");
                     header.getChildren().add(countLabel);
+                    
+                    // Setup Export Action
+                    btnExport.setDisable(false);
+                    btnExport.setOnAction(e -> exportToCsv(students, btnExport.getScene().getWindow()));
                 }
             });
         });
@@ -120,14 +130,14 @@ public class StudentListView {
         infoGrid.setHgap(12);
         
         Label lblEmail = new Label("Email:");
-        lblEmail.setStyle("-fx-text-fill: #6B7280; -fx-font-size: 12px;");
+        lblEmail.setStyle("-fx-text-fill: -fx-secondary-text; -fx-font-size: 12px;");
         Label valEmail = new Label(student.getEmail());
-        valEmail.setStyle("-fx-text-fill: #374151; -fx-font-size: 12px;");
+        valEmail.setStyle("-fx-text-fill: -fx-primary-text; -fx-font-size: 12px;");
         
         Label lblId = new Label("ID Siswa:");
-        lblId.setStyle("-fx-text-fill: #6B7280; -fx-font-size: 12px;");
+        lblId.setStyle("-fx-text-fill: -fx-secondary-text; -fx-font-size: 12px;");
         Label valId = new Label(student.getStudentId() != null && !student.getStudentId().isEmpty() ? student.getStudentId() : "-");
-        valId.setStyle("-fx-text-fill: #374151; -fx-font-size: 12px;");
+        valId.setStyle("-fx-text-fill: -fx-primary-text; -fx-font-size: 12px;");
         
         infoGrid.add(lblEmail, 0, 0);
         infoGrid.add(valEmail, 1, 0);
@@ -136,5 +146,48 @@ public class StudentListView {
 
         card.getChildren().addAll(topRow, sep, infoGrid);
         return card;
+    }
+
+    private void exportToCsv(List<Student> students, javafx.stage.Window ownerWindow) {
+        javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
+        fileChooser.setTitle("Simpan Data Siswa");
+        fileChooser.getExtensionFilters().add(new javafx.stage.FileChooser.ExtensionFilter("CSV Files", "*.csv"));
+        fileChooser.setInitialFileName("data_siswa.csv");
+        
+        java.io.File file = fileChooser.showSaveDialog(ownerWindow);
+        if (file != null) {
+            try (java.io.PrintWriter writer = new java.io.PrintWriter(new java.io.FileWriter(file))) {
+                // Tulis Header CSV
+                writer.println("ID Siswa,Nama Lengkap,Username,Email,Status");
+                
+                // Tulis Data
+                for (Student s : students) {
+                    String id = s.getStudentId() != null ? s.getStudentId() : "-";
+                    String name = s.getFullName() != null && !s.getFullName().isEmpty() ? s.getFullName() : s.getUsername();
+                    String username = s.getUsername() != null ? s.getUsername() : "";
+                    String email = s.getEmail() != null ? s.getEmail() : "";
+                    String status = "Aktif"; // default sementara
+                    
+                    // Gunakan double quotes untuk mencegah masalah jika ada koma di data
+                    writer.printf("\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"%n", id, name, username, email, status);
+                }
+                
+                controller.showCustomAlert(
+                    javafx.scene.control.Alert.AlertType.INFORMATION,
+                    "Ekspor Berhasil",
+                    "Data Berhasil Disimpan",
+                    "Data siswa telah diekspor ke: " + file.getAbsolutePath()
+                );
+                
+            } catch (java.io.IOException ex) {
+                System.err.println("Gagal mengekspor data: " + ex.getMessage());
+                controller.showCustomAlert(
+                    javafx.scene.control.Alert.AlertType.ERROR,
+                    "Ekspor Gagal",
+                    "Terjadi kesalahan saat menyimpan",
+                    "Gagal menulis file: " + ex.getMessage()
+                );
+            }
+        }
     }
 }

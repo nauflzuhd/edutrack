@@ -142,7 +142,25 @@ public class VideoMaterial extends CourseMaterial {
             }
         });
 
-        container.getChildren().addAll(titleLabel, playerContainer, durationLabel, descLabel, noticeBox, openLinkButton);
+        HBox actionBox = new HBox(12);
+        actionBox.setAlignment(Pos.CENTER);
+        actionBox.getChildren().add(openLinkButton);
+
+        if (getAttachmentUrl() != null && !getAttachmentUrl().isEmpty()) {
+            Button btnDownload = new Button("Unduh Lampiran: " + getAttachmentFileName());
+            btnDownload.setStyle("-fx-background-color: #3B82F6; -fx-text-fill: white; -fx-cursor: hand;");
+            btnDownload.getStyleClass().addAll("btn-primary", "btn-large");
+            btnDownload.setOnAction(e -> {
+                try {
+                    java.awt.Desktop.getDesktop().browse(new java.net.URI(getAttachmentUrl()));
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            });
+            actionBox.getChildren().add(btnDownload);
+        }
+
+        container.getChildren().addAll(titleLabel, playerContainer, durationLabel, descLabel, noticeBox, actionBox);
         return container;
     }
 
