@@ -98,19 +98,21 @@ public class TextMaterial extends CourseMaterial {
         // Separator visual
         javafx.scene.control.Separator separator = new javafx.scene.control.Separator();
 
-        // Area bacaan yang rapi dan nyaman dibaca (Label di dalam ScrollPane)
-        Label contentLabel = new Label(textContent != null ? textContent : "(Konten tidak tersedia)");
-        contentLabel.setWrapText(true);
-        contentLabel.getStyleClass().add("text-reader-body");
-        contentLabel.setMaxWidth(680); // Lebar nyaman membaca (ergonomis)
+        // Area bacaan yang rapi dan nyaman dibaca (WebView)
+        javafx.scene.web.WebView webView = new javafx.scene.web.WebView();
+        String htmlContent = textContent != null ? textContent : "(Konten tidak tersedia)";
+        
+        // Wrap content with basic styling to ensure it looks good and fits the width
+        String styledHtml = "<html><head><style>" +
+                "body { font-family: 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 15px; color: #1F2937; line-height: 1.6; padding: 10px; }" +
+                "img { max-width: 100%; height: auto; }" +
+                "</style></head><body>" + htmlContent + "</body></html>";
+                
+        webView.getEngine().loadContent(styledHtml);
+        webView.setPrefHeight(380);
+        VBox.setVgrow(webView, Priority.ALWAYS);
 
-        ScrollPane scrollPane = new ScrollPane(contentLabel);
-        scrollPane.setFitToWidth(true);
-        scrollPane.setPrefHeight(380);
-        scrollPane.getStyleClass().add("text-reader-scroll");
-        VBox.setVgrow(scrollPane, Priority.ALWAYS);
-
-        container.getChildren().addAll(headerBox, descLabel, separator, scrollPane);
+        container.getChildren().addAll(headerBox, descLabel, separator, webView);
         return container;
     }
 }

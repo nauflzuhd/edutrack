@@ -25,6 +25,9 @@ import javafx.scene.image.ImageView;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import javafx.animation.FadeTransition;
+import javafx.animation.TranslateTransition;
+import javafx.util.Duration;
 
 /**
  * DashboardController - Controller untuk halaman Dashboard Utama.
@@ -47,6 +50,7 @@ public class DashboardController implements Initializable {
     @FXML private Label greetingLabel;
     @FXML private VBox contentArea;
     @FXML private ScrollPane contentScrollPane;
+    @FXML private StackPane rootStackPane;
 
     private final MaterialService materialService = new MaterialService();
     private final DashboardService dashboardService = new DashboardService();
@@ -109,6 +113,28 @@ public class DashboardController implements Initializable {
     }
 
     // =====================================================================
+    //  ANIMATION UTILS
+    // =====================================================================
+
+    private void switchContent(Node newContent) {
+        contentArea.getChildren().clear();
+        contentArea.getChildren().add(newContent);
+        
+        // Animasi Fade In
+        FadeTransition fadeIn = new FadeTransition(Duration.millis(300), newContent);
+        fadeIn.setFromValue(0.0);
+        fadeIn.setToValue(1.0);
+        
+        // Animasi Slide Up
+        TranslateTransition slideUp = new TranslateTransition(Duration.millis(300), newContent);
+        slideUp.setFromY(20);
+        slideUp.setToY(0);
+        
+        fadeIn.play();
+        slideUp.play();
+    }
+
+    // =====================================================================
     //  NAVIGASI
     // =====================================================================
 
@@ -116,8 +142,7 @@ public class DashboardController implements Initializable {
     public void showDashboardContent() {
         setActiveButton(btnDashboard);
         contentTitleLabel.setText("Dashboard");
-        contentArea.getChildren().clear();
-        contentArea.getChildren().add(dashboardHomeView.buildContent());
+        switchContent(dashboardHomeView.buildContent());
     }
 
     private final com.doamamah.edutrack.fe.enrollment.EnrollmentService enrollmentService = new com.doamamah.edutrack.fe.enrollment.EnrollmentService();
@@ -126,7 +151,6 @@ public class DashboardController implements Initializable {
     public void showMaterialsContent() {
         setActiveButton(btnMaterials);
         contentTitleLabel.setText("Daftar Materi");
-        contentArea.getChildren().clear();
 
         ProgressIndicator loading = new ProgressIndicator();
         loading.setPrefSize(40, 40);
@@ -134,7 +158,7 @@ public class DashboardController implements Initializable {
         loadingBox.setAlignment(Pos.CENTER);
         loadingBox.setSpacing(12);
         loadingBox.setPadding(new Insets(40));
-        contentArea.getChildren().add(loadingBox);
+        switchContent(loadingBox);
 
         Thread fetchThread = new Thread(() -> {
             List<Long> teacherIds = null;
@@ -148,8 +172,7 @@ public class DashboardController implements Initializable {
             }
             List<CourseMaterial> materials = materialService.getAllMaterials(teacherIds);
             Platform.runLater(() -> {
-                contentArea.getChildren().clear();
-                contentArea.getChildren().add(materialView.buildListContent(materials));
+                switchContent(materialView.buildListContent(materials));
             });
         });
         fetchThread.setDaemon(true);
@@ -160,8 +183,7 @@ public class DashboardController implements Initializable {
     public void showQuizContent() {
         setActiveButton(btnQuiz);
         contentTitleLabel.setText("Kuis");
-        contentArea.getChildren().clear();
-        contentArea.getChildren().add(quizView.buildQuizContent());
+        switchContent(quizView.buildQuizContent());
     }
 
 
@@ -170,25 +192,22 @@ public class DashboardController implements Initializable {
     public void showStudentsContent() {
         setActiveButton(btnStudents);
         contentTitleLabel.setText("Daftar Siswa");
-        contentArea.getChildren().clear();
-        contentArea.getChildren().add(studentListView.buildContent());
+        switchContent(studentListView.buildContent());
     }
 
     @FXML
     public void showTeachersContent() {
         setActiveButton(btnTeachers);
         contentTitleLabel.setText("Pengajar");
-        contentArea.getChildren().clear();
-        contentArea.getChildren().add(teacherListView.buildContent());
+        switchContent(teacherListView.buildContent());
     }
 
     @FXML
     public void showProfileContent() {
         setActiveButton(btnProfile);
         contentTitleLabel.setText("Profil Saya");
-        contentArea.getChildren().clear();
         profileView = new ProfileView(this); // refresh with latest data
-        contentArea.getChildren().add(profileView.buildContent());
+        switchContent(profileView.buildContent());
     }
 
     @FXML
@@ -264,6 +283,58 @@ public class DashboardController implements Initializable {
             System.err.println("Gagal memuat stylesheet ke alert dialog: " + e.getMessage());
         }
         return alert.showAndWait().orElse(ButtonType.CANCEL);
+    }
+
+    public void showToast(String message, String type) {
+        if (rootStackPane == null) return;
+        
+        Platform.runLater(() -> {
+            Label toastLabel = new Label(message);
+            toastLabel.setWrapText(true);
+            toastLabel.setMaxWidth(300);
+            
+            HBox toastBox = new HBox(12);
+            toastBox.setAlignment(Pos.CENTER_LEFT);
+            toastBox.setPadding(new Insets(12, 16, 12, 16));
+            toastBox.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+            
+            String bgColor = "#10B981"; // SUCCESS
+            String icon = "✅";
+            if ("ERROR".equals(type)) {
+                bgColor = "#EF4444";
+                icon = "❌";
+            } else if ("INFO".equals(type)) {
+                bgColor = "#3B82F6";
+                icon = "ℹ️";
+            }
+            
+            toastBox.setStyle("-fx-background-color: " + bgColor + "; -fx-background-radius: 8px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 4);");
+            
+            Label iconLabel = new Label(icon);
+            iconLabel.setStyle("-fx-text-fill: white; -fx-font-size: 16px;");
+            toastLabel.setStyle("-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;");
+            
+            toastBox.getChildren().addAll(iconLabel, toastLabel);
+            
+            StackPane.setAlignment(toastBox, Pos.BOTTOM_RIGHT);
+            StackPane.setMargin(toastBox, new Insets(0, 24, 24, 0));
+            
+            toastBox.setOpacity(0);
+            rootStackPane.getChildren().add(toastBox);
+            
+            FadeTransition fadeIn = new FadeTransition(Duration.millis(300), toastBox);
+            fadeIn.setFromValue(0);
+            fadeIn.setToValue(1);
+            
+            FadeTransition fadeOut = new FadeTransition(Duration.millis(300), toastBox);
+            fadeOut.setFromValue(1);
+            fadeOut.setToValue(0);
+            fadeOut.setDelay(Duration.seconds(3));
+            fadeOut.setOnFinished(e -> rootStackPane.getChildren().remove(toastBox));
+            
+            fadeIn.play();
+            fadeOut.play();
+        });
     }
 
     private void setActiveButton(Button activeBtn) {

@@ -59,11 +59,15 @@
 }
 
 /* Inputs and Forms */
-.input-field, .combo-box.input-field {
+.input-field, .combo-box.input-field, .text-area.input-field {
     -fx-background-color: #2C2C2C;
     -fx-text-fill: #E0E0E0;
     -fx-prompt-text-fill: #808080;
     -fx-border-color: #444444;
+}
+
+.text-area.input-field .content {
+    -fx-background-color: #2C2C2C;
 }
 
 .combo-box.input-field .list-cell {
@@ -154,4 +158,9 @@
 .left-stat-box {
     -fx-background-color: #2C2C2C;
     -fx-border-color: #444444;
+}
+
+/* Charts */
+.chart-vertical-grid-lines, .chart-horizontal-grid-lines {
+    -fx-stroke: #333333;
 }

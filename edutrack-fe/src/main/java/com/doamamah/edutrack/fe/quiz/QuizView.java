@@ -120,7 +120,16 @@ public class QuizView {
         Label quizTitle = new Label("Kuis & Evaluasi");
         quizTitle.getStyleClass().add("section-title");
         quizTitle.setStyle("-fx-font-size: 20px;");
-        titleRow.getChildren().addAll(quizIcon, quizTitle);
+        
+        TextField searchQuizField = new TextField();
+        searchQuizField.setPromptText("🔍 Cari kuis...");
+        searchQuizField.getStyleClass().add("input-field");
+        searchQuizField.setPrefWidth(220);
+        
+        Region qSpacer = new Region();
+        HBox.setHgrow(qSpacer, Priority.ALWAYS);
+        
+        titleRow.getChildren().addAll(quizIcon, quizTitle, qSpacer, searchQuizField);
 
         Label quizSub = new Label("Uji pemahamanmu setelah mempelajari materi.");
         quizSub.getStyleClass().add("card-description");
@@ -196,27 +205,38 @@ public class QuizView {
                 quizContainer.setMaxWidth(Double.MAX_VALUE);
                 quizContainer.setPrefWrapLength(750);
 
-                if (quizzes.isEmpty()) {
-                    Label emptyLabel = new Label("Belum ada kuis yang tersedia.");
-                    emptyLabel.getStyleClass().add("placeholder-text");
-                    leftColumn.getChildren().add(emptyLabel);
-                } else {
-                    for (QuizData q : quizzes) {
-                        Integer highestScore = null;
-                        for (QuizService.QuizAttemptData att : attempts) {
-                            if (att.getQuizId() == q.getId()) {
-                                if (highestScore == null || att.getScore() > highestScore) {
-                                    highestScore = att.getScore();
+                Runnable updateStudentList = () -> {
+                    quizContainer.getChildren().clear();
+                    String query = searchQuizField.getText().toLowerCase();
+                    List<QuizData> filtered = quizzes.stream()
+                        .filter(q -> q.getTitle().toLowerCase().contains(query) || (q.getDescription() != null && q.getDescription().toLowerCase().contains(query)))
+                        .toList();
+
+                    if (filtered.isEmpty()) {
+                        Label emptyLabel = new Label("Tidak ada kuis ditemukan.");
+                        emptyLabel.getStyleClass().add("placeholder-text");
+                        quizContainer.getChildren().add(emptyLabel);
+                    } else {
+                        for (QuizData q : filtered) {
+                            Integer highestScore = null;
+                            for (QuizService.QuizAttemptData att : attempts) {
+                                if (att.getQuizId() == q.getId()) {
+                                    if (highestScore == null || att.getScore() > highestScore) {
+                                        highestScore = att.getScore();
+                                    }
                                 }
                             }
+                            VBox card = buildQuizCard(q, highestScore);
+                            card.setPrefWidth(380);
+                            card.setMinWidth(320);
+                            quizContainer.getChildren().add(card);
                         }
-                        VBox card = buildQuizCard(q, highestScore);
-                        card.setPrefWidth(380);
-                        card.setMinWidth(320);
-                        quizContainer.getChildren().add(card);
                     }
-                    leftColumn.getChildren().add(quizContainer);
-                }
+                };
+
+                searchQuizField.textProperty().addListener((obs, oldVal, newVal) -> updateStudentList.run());
+                updateStudentList.run();
+                leftColumn.getChildren().add(quizContainer);
             });
         });
         fetchThread.setDaemon(true);
@@ -259,8 +279,20 @@ public class QuizView {
         headerBox.getChildren().addAll(titleBox, btnCreateQuiz);
 
         // Daftar Kuis Tersedia
+        HBox quizzesTitleRow = new HBox(12);
+        quizzesTitleRow.setAlignment(Pos.CENTER_LEFT);
         Label quizzesTitle = new Label("Daftar Kuis Tersedia");
         quizzesTitle.setStyle("-fx-font-weight: bold; -fx-text-fill: -fx-primary-text; -fx-font-size: 15px;");
+        
+        TextField searchQuizField = new TextField();
+        searchQuizField.setPromptText("🔍 Cari kuis...");
+        searchQuizField.getStyleClass().add("input-field");
+        searchQuizField.setPrefWidth(220);
+        
+        Region qSpacer = new Region();
+        HBox.setHgrow(qSpacer, Priority.ALWAYS);
+        
+        quizzesTitleRow.getChildren().addAll(quizzesTitle, qSpacer, searchQuizField);
 
         // Loading indicator
         ProgressIndicator loading = new ProgressIndicator();
@@ -296,7 +328,7 @@ public class QuizView {
         emptyResultsLbl.setStyle("-fx-text-fill: -fx-secondary-text; -fx-font-style: italic;");
         resultsContainer.getChildren().add(emptyResultsLbl);
 
-        leftColumn.getChildren().addAll(headerBox, quizzesTitle, quizzesListContainer, resultsTitleRow, resultsContainer);
+        leftColumn.getChildren().addAll(headerBox, quizzesTitleRow, quizzesListContainer, resultsTitleRow, resultsContainer);
 
         // Right side: Quiz Summary Stats
         VBox rightColumn = new VBox(16);
@@ -326,16 +358,26 @@ public class QuizView {
             java.util.Map<String, Double> stats = controller.getDashboardService().getDashboardStats();
 
             Platform.runLater(() -> {
-                quizzesListContainer.getChildren().clear();
-                if (quizzes.isEmpty()) {
-                    Label emptyLbl = new Label("Belum ada kuis yang dibuat.");
-                    emptyLbl.setStyle("-fx-text-fill: -fx-secondary-text; -fx-font-style: italic;");
-                    quizzesListContainer.getChildren().add(emptyLbl);
-                } else {
-                    for (QuizData q : quizzes) {
-                        quizzesListContainer.getChildren().add(buildTeacherQuizRow(q));
+                Runnable updateTeacherList = () -> {
+                    quizzesListContainer.getChildren().clear();
+                    String query = searchQuizField.getText().toLowerCase();
+                    List<QuizData> filtered = quizzes.stream()
+                        .filter(q -> q.getTitle().toLowerCase().contains(query) || (q.getDescription() != null && q.getDescription().toLowerCase().contains(query)))
+                        .toList();
+
+                    if (filtered.isEmpty()) {
+                        Label emptyLbl = new Label("Tidak ada kuis ditemukan.");
+                        emptyLbl.setStyle("-fx-text-fill: -fx-secondary-text; -fx-font-style: italic;");
+                        quizzesListContainer.getChildren().add(emptyLbl);
+                    } else {
+                        for (QuizData q : filtered) {
+                            quizzesListContainer.getChildren().add(buildTeacherQuizRow(q));
+                        }
                     }
-                }
+                };
+
+                searchQuizField.textProperty().addListener((obs, oldVal, newVal) -> updateTeacherList.run());
+                updateTeacherList.run();
 
                 resultsContainer.getChildren().clear();
                 if (attempts.isEmpty()) {
@@ -612,10 +654,7 @@ public class QuizView {
     private VBox buildMiniStatRow(String label, String value, String unit, String color) {
         VBox box = new VBox(6);
         box.setPadding(new Insets(10, 14, 10, 14));
-        box.setStyle(
-            "-fx-background-color: #FAF8F3; -fx-background-radius: 8px; " +
-            "-fx-border-color: #E5E0D8; -fx-border-radius: 8px; -fx-border-width: 1px;"
-        );
+        box.getStyleClass().add("left-stat-box");
 
         Label lbl = new Label(label);
         lbl.setStyle("-fx-font-size: 11px; -fx-text-fill: -fx-secondary-text; -fx-font-weight: bold;");
@@ -649,20 +688,10 @@ public class QuizView {
                             att.getScore(),
                             att.getAttemptDate());
                 }
-                controller.showCustomAlert(
-                    javafx.scene.control.Alert.AlertType.INFORMATION,
-                    "Ekspor Berhasil",
-                    "Data Berhasil Disimpan",
-                    "Data nilai kuis telah diekspor ke: " + file.getAbsolutePath()
-                );
+                controller.showToast("Data nilai kuis berhasil diekspor ke: " + file.getName(), "SUCCESS");
             } catch (java.io.IOException ex) {
                 System.err.println("Gagal mengekspor data: " + ex.getMessage());
-                controller.showCustomAlert(
-                    javafx.scene.control.Alert.AlertType.ERROR,
-                    "Ekspor Gagal",
-                    "Terjadi kesalahan saat menyimpan",
-                    "Gagal menulis file: " + ex.getMessage()
-                );
+                controller.showToast("Gagal menulis file: " + ex.getMessage(), "ERROR");
             }
         }
     }
@@ -903,12 +932,7 @@ public class QuizView {
                     btnSave.setText(isEdit ? "Simpan Perubahan" : "Simpan Kuis");
 
                     if (result != null) {
-                        controller.showCustomAlert(
-                            Alert.AlertType.INFORMATION,
-                            "Berhasil",
-                            isEdit ? "Kuis Berhasil Diperbarui!" : "Kuis Baru Berhasil Dibuat!",
-                            isEdit ? "Kuis '" + title + "' telah diperbarui." : "Kuis '" + title + "' kini sudah dapat diakses oleh seluruh siswa."
-                        );
+                        controller.showToast(isEdit ? "Kuis Berhasil Diperbarui!" : "Kuis Baru Berhasil Dibuat!", "SUCCESS");
                         invalidateCache();
                         controller.showQuizContent();
                     } else {

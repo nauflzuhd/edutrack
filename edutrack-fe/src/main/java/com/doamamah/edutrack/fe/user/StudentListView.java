@@ -37,12 +37,17 @@ public class StudentListView {
         Region sp = new Region();
         HBox.setHgrow(sp, Priority.ALWAYS);
         
+        javafx.scene.control.TextField searchField = new javafx.scene.control.TextField();
+        searchField.setPromptText("🔍 Cari siswa...");
+        searchField.getStyleClass().add("input-field");
+        searchField.setPrefWidth(220);
+        
         javafx.scene.control.Button btnExport = new javafx.scene.control.Button("Export ke Excel");
         btnExport.getStyleClass().addAll("btn-secondary", "btn-small");
         btnExport.setStyle("-fx-background-color: #059669; -fx-text-fill: white;");
         btnExport.setDisable(true); // Akan di-enable setelah data dimuat
         
-        header.getChildren().addAll(sectionLabel, sp, btnExport);
+        header.getChildren().addAll(sectionLabel, sp, searchField, btnExport);
         root.getChildren().add(header);
 
         // Loading
@@ -73,13 +78,36 @@ public class StudentListView {
                     cardsContainer.setMaxWidth(Double.MAX_VALUE);
                     cardsContainer.setPrefWrapLength(750);
 
-                    for (Student s : students) {
-                        cardsContainer.getChildren().add(buildStudentCard(s));
-                    }
+                    Label countLabel = new Label();
+                    countLabel.getStyleClass().add("material-count");
+
+                    Runnable updateStudentList = () -> {
+                        cardsContainer.getChildren().clear();
+                        String query = searchField.getText().toLowerCase();
+                        java.util.List<Student> filtered = students.stream()
+                            .filter(s -> (s.getFullName() != null && s.getFullName().toLowerCase().contains(query)) ||
+                                         (s.getUsername() != null && s.getUsername().toLowerCase().contains(query)) ||
+                                         (s.getEmail() != null && s.getEmail().toLowerCase().contains(query)))
+                            .toList();
+
+                        countLabel.setText("Total " + filtered.size() + " siswa");
+
+                        if (filtered.isEmpty()) {
+                            Label emptyLbl = new Label("Tidak ada siswa ditemukan.");
+                            emptyLbl.setStyle("-fx-text-fill: -fx-secondary-text; -fx-font-style: italic;");
+                            cardsContainer.getChildren().add(emptyLbl);
+                        } else {
+                            for (Student s : filtered) {
+                                cardsContainer.getChildren().add(buildStudentCard(s));
+                            }
+                        }
+                    };
+
+                    searchField.textProperty().addListener((obs, oldVal, newVal) -> updateStudentList.run());
+                    updateStudentList.run();
+
                     root.getChildren().add(cardsContainer);
                     
-                    Label countLabel = new Label("Total " + students.size() + " siswa");
-                    countLabel.getStyleClass().add("material-count");
                     header.getChildren().add(countLabel);
                     
                     // Setup Export Action
@@ -172,21 +200,11 @@ public class StudentListView {
                     writer.printf("\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"%n", id, name, username, email, status);
                 }
                 
-                controller.showCustomAlert(
-                    javafx.scene.control.Alert.AlertType.INFORMATION,
-                    "Ekspor Berhasil",
-                    "Data Berhasil Disimpan",
-                    "Data siswa telah diekspor ke: " + file.getAbsolutePath()
-                );
+                controller.showToast("Data siswa berhasil diekspor ke: " + file.getName(), "SUCCESS");
                 
             } catch (java.io.IOException ex) {
                 System.err.println("Gagal mengekspor data: " + ex.getMessage());
-                controller.showCustomAlert(
-                    javafx.scene.control.Alert.AlertType.ERROR,
-                    "Ekspor Gagal",
-                    "Terjadi kesalahan saat menyimpan",
-                    "Gagal menulis file: " + ex.getMessage()
-                );
+                controller.showToast("Gagal menulis file: " + ex.getMessage(), "ERROR");
             }
         }
     }

@@ -126,8 +126,7 @@ public class ProfileView {
         bioField.setWrapText(true);
         bioField.setPrefRowCount(3);
         bioField.setMaxWidth(Double.MAX_VALUE);
-        bioField.setStyle("-fx-font-size: 13px; -fx-background-radius: 8; -fx-border-radius: 8; " +
-                "-fx-border-color: #D1D5DB; -fx-padding: 8;");
+        bioField.getStyleClass().add("input-field");
         bioEditBox.getChildren().addAll(bioEditLabel, bioField);
 
         // Specialization field (only for teachers)

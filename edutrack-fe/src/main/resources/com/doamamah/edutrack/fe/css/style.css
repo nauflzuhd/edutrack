@@ -146,6 +146,10 @@
     -fx-font-size: 14px;
 }
 
+.text-area.input-field .content {
+    -fx-background-color: transparent;
+}
+
 .input-field:focused {
     -fx-border-color: #FF7A00;
     -fx-effect: dropshadow(gaussian, rgba(255, 122, 0, 0.15), 0, 0, 0, 3);
@@ -797,6 +801,35 @@
 .bg-decor-sparkle {
     -fx-fill: #FF7A00;
     -fx-opacity: 0.15;
+}
+
+/* =====================================================================
+   DASHBOARD CHARTS (Line & Bar Chart)
+   ===================================================================== */
+
+.chart {
+    -fx-padding: 10px;
+}
+.chart-title {
+    -fx-text-fill: -fx-primary-text;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+.axis-label {
+    -fx-text-fill: -fx-secondary-text;
+}
+.axis {
+    -fx-tick-label-fill: -fx-secondary-text;
+}
+.chart-plot-background {
+    -fx-background-color: transparent;
+}
+.chart-vertical-grid-lines, .chart-horizontal-grid-lines {
+    -fx-stroke: #E5E0D8;
+}
+.chart-alternative-row-fill, .chart-alternative-column-fill {
+    -fx-fill: transparent;
+    -fx-stroke: transparent;
 }
 
 .bg-decor-sparkle-gold {

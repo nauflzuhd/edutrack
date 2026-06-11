@@ -51,11 +51,17 @@ public class MaterialView {
             header.setAlignment(Pos.CENTER_LEFT);
             Label sectionLabel = new Label("Daftar Materi Tersedia");
             sectionLabel.getStyleClass().add("section-title");
+            
+            TextField searchField = new TextField();
+            searchField.setPromptText("🔍 Cari materi...");
+            searchField.getStyleClass().add("input-field");
+            searchField.setPrefWidth(220);
+            
             Region sp = new Region();
             HBox.setHgrow(sp, Priority.ALWAYS);
             Label countLabel = new Label(materials.size() + " materi");
             countLabel.getStyleClass().add("material-count");
-            header.getChildren().addAll(sectionLabel, sp, countLabel);
+            header.getChildren().addAll(sectionLabel, sp, searchField, countLabel);
             leftColumn.getChildren().add(header);
 
             // FlowPane for responsive wrapping columns
@@ -65,12 +71,29 @@ public class MaterialView {
             cardsContainer.setMaxWidth(Double.MAX_VALUE);
             cardsContainer.setPrefWrapLength(750);
 
-            for (CourseMaterial material : materials) {
-                VBox card = buildMaterialCard(material);
-                card.setPrefWidth(340);
-                card.setMinWidth(300);
-                cardsContainer.getChildren().add(card);
-            }
+            Runnable updateStudentList = () -> {
+                cardsContainer.getChildren().clear();
+                String query = searchField.getText().toLowerCase();
+                java.util.List<CourseMaterial> filtered = materials.stream()
+                    .filter(m -> m.getTitle().toLowerCase().contains(query) || (m.getDescription() != null && m.getDescription().toLowerCase().contains(query)))
+                    .toList();
+
+                if (filtered.isEmpty()) {
+                    Label emptyLbl = new Label("Tidak ada materi ditemukan.");
+                    emptyLbl.setStyle("-fx-text-fill: -fx-secondary-text; -fx-font-style: italic;");
+                    cardsContainer.getChildren().add(emptyLbl);
+                } else {
+                    for (CourseMaterial material : filtered) {
+                        VBox card = buildMaterialCard(material);
+                        card.setPrefWidth(340);
+                        card.setMinWidth(300);
+                        cardsContainer.getChildren().add(card);
+                    }
+                }
+            };
+
+            searchField.textProperty().addListener((obs, oldVal, newVal) -> updateStudentList.run());
+            updateStudentList.run();
 
             leftColumn.getChildren().add(cardsContainer);
         }
@@ -192,23 +215,46 @@ public class MaterialView {
         headerBox.getChildren().addAll(titleBox, btnCreate);
 
         // Daftar Materi Tersedia
+        HBox listHeader = new HBox(12);
+        listHeader.setAlignment(Pos.CENTER_LEFT);
         Label matListTitle = new Label("Daftar Materi Tersedia");
         matListTitle.setStyle("-fx-font-weight: bold; -fx-text-fill: -fx-primary-text; -fx-font-size: 15px;");
+        
+        TextField searchField = new TextField();
+        searchField.setPromptText("🔍 Cari materi...");
+        searchField.getStyleClass().add("input-field");
+        searchField.setPrefWidth(220);
+        
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        
+        listHeader.getChildren().addAll(matListTitle, spacer, searchField);
 
         VBox matListContainer = new VBox(10);
         matListContainer.setMaxWidth(Double.MAX_VALUE);
 
-        if (materials.isEmpty()) {
-            Label emptyLbl = new Label("Belum ada materi yang dibuat.");
-            emptyLbl.setStyle("-fx-text-fill: -fx-secondary-text; -fx-font-style: italic;");
-            matListContainer.getChildren().add(emptyLbl);
-        } else {
-            for (CourseMaterial m : materials) {
-                matListContainer.getChildren().add(buildTeacherMaterialRow(m));
-            }
-        }
+        Runnable updateTeacherList = () -> {
+            matListContainer.getChildren().clear();
+            String query = searchField.getText().toLowerCase();
+            java.util.List<CourseMaterial> filtered = materials.stream()
+                .filter(m -> m.getTitle().toLowerCase().contains(query) || (m.getDescription() != null && m.getDescription().toLowerCase().contains(query)))
+                .toList();
 
-        leftColumn.getChildren().addAll(headerBox, matListTitle, matListContainer);
+            if (filtered.isEmpty()) {
+                Label emptyLbl = new Label("Tidak ada materi ditemukan.");
+                emptyLbl.setStyle("-fx-text-fill: -fx-secondary-text; -fx-font-style: italic;");
+                matListContainer.getChildren().add(emptyLbl);
+            } else {
+                for (CourseMaterial m : filtered) {
+                    matListContainer.getChildren().add(buildTeacherMaterialRow(m));
+                }
+            }
+        };
+
+        searchField.textProperty().addListener((obs, oldVal, newVal) -> updateTeacherList.run());
+        updateTeacherList.run();
+
+        leftColumn.getChildren().addAll(headerBox, listHeader, matListContainer);
 
         // Right side: Stats
         VBox rightColumn = new VBox(16);
@@ -289,10 +335,7 @@ public class MaterialView {
     private VBox buildMiniStatRow(String label, String value, String unit, String color) {
         VBox box = new VBox(6);
         box.setPadding(new Insets(10, 14, 10, 14));
-        box.setStyle(
-            "-fx-background-color: #FAF8F3; -fx-background-radius: 8px; " +
-            "-fx-border-color: #E5E0D8; -fx-border-radius: 8px; -fx-border-width: 1px;"
-        );
+        box.getStyleClass().add("left-stat-box");
 
         Label lbl = new Label(label);
         lbl.setStyle("-fx-font-size: 11px; -fx-text-fill: -fx-secondary-text; -fx-font-weight: bold;");
@@ -573,11 +616,10 @@ public class MaterialView {
         if (isEdit && materialToEdit instanceof TextMaterial tm) {
             initialContent = tm.getTextContent();
         }
-        TextArea txtContent = new TextArea(initialContent);
-        txtContent.setPrefHeight(250);
-        txtContent.setWrapText(true);
-        txtContent.setPromptText("Tuliskan seluruh materi pembelajaran di sini...");
-        VBox contentBox = controller.createInputField("Konten Teks Materi", txtContent);
+        javafx.scene.web.HTMLEditor txtContent = new javafx.scene.web.HTMLEditor();
+        txtContent.setHtmlText(initialContent);
+        txtContent.setPrefHeight(300);
+        VBox contentBox = controller.createInputField("Konten Teks Materi (Rich Text)", txtContent);
         textForm.getChildren().add(contentBox);
 
         // Set default dynamic form
@@ -647,8 +689,9 @@ public class MaterialView {
 
                 material = new VideoMaterial(isEdit ? materialToEdit.getId() : null, title, desc, url, duration);
             } else {
-                String content = txtContent.getText().trim();
-                if (content.isEmpty()) {
+                String content = txtContent.getHtmlText();
+                // HTMLEditor wraps empty text in html tags, we check if it's very short or empty
+                if (content == null || content.replaceAll("<[^>]*>", "").trim().isEmpty()) {
                     showFormError(errorMsg, "Konten teks materi tidak boleh kosong!");
                     return;
                 }
@@ -669,13 +712,7 @@ public class MaterialView {
             }
 
             // Success notification alert
-            controller.showCustomAlert(
-                Alert.AlertType.INFORMATION,
-                "Berhasil",
-                isEdit ? "Materi Berhasil Diperbarui!" : "Materi Baru Berhasil Disimpan!",
-                isEdit ? "Perubahan pada materi '" + title + "' kini sudah tersimpan."
-                       : "Materi '" + title + "' kini sudah dapat diakses oleh seluruh siswa."
-            );
+            controller.showToast(isEdit ? "Materi Berhasil Diperbarui!" : "Materi Baru Berhasil Disimpan!", "SUCCESS");
 
             controller.showMaterialsContent();
         });

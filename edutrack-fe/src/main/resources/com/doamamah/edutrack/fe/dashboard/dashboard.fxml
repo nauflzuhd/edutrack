@@ -178,7 +178,7 @@
             </HBox>
 
             <!-- Area Konten Dinamis dengan Decal Background -->
-            <StackPane VBox.vgrow="ALWAYS">
+            <StackPane fx:id="rootStackPane" VBox.vgrow="ALWAYS">
                 <!-- Decal Hiasan Background (Absolut) -->
                 <AnchorPane mouseTransparent="true" StackPane.alignment="CENTER">
                     <SVGPath content="M10 0 L13 7 L20 8 L15 13 L16 20 L10 16 L4 20 L5 13 L0 8 L7 7 Z" styleClass="bg-decor-star" scaleX="1.3" scaleY="1.3" AnchorPane.topAnchor="140.0" AnchorPane.leftAnchor="120.0"/>

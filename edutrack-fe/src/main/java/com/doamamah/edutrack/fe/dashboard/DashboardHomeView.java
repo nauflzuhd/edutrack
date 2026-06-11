@@ -12,6 +12,11 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.layout.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -151,7 +156,31 @@ public class DashboardHomeView {
         pRight.getStyleClass().add("progress-percent");
         progressInfo.getChildren().addAll(pLeft, spacer, pRight);
 
-        progressSection.getChildren().addAll(progressTitle, dailyBar, progressInfo);
+        // Chart Progres Nilai Kuis Siswa
+        CategoryAxis xAxis = new CategoryAxis();
+        xAxis.setLabel("Kuis");
+        NumberAxis yAxis = new NumberAxis(0, 100, 20);
+        yAxis.setLabel("Nilai");
+        LineChart<String, Number> progressChart = new LineChart<>(xAxis, yAxis);
+        progressChart.setTitle("Perkembangan Nilai Kuis");
+        progressChart.setLegendVisible(false);
+        progressChart.setMinHeight(200);
+        progressChart.setAnimated(true);
+
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        int attemptCounter = 1;
+        for (QuizService.QuizAttemptData att : studentAttempts) {
+            // Gunakan singkatan nama kuis agar muat di sumbu X
+            String shortTitle = att.getQuizTitle().length() > 10 
+                                ? att.getQuizTitle().substring(0, 10) + "..." 
+                                : att.getQuizTitle();
+            // Tambahkan counter agar jika ada nama sama tetap unik
+            series.getData().add(new XYChart.Data<>(shortTitle + " (" + attemptCounter + ")", att.getScore()));
+            attemptCounter++;
+        }
+        progressChart.getData().add(series);
+
+        progressSection.getChildren().addAll(progressTitle, dailyBar, progressInfo, progressChart);
 
         // Riwayat Kuis Terakhir
         VBox historySection = new VBox(10);
@@ -348,7 +377,40 @@ public class DashboardHomeView {
         HBox.setHgrow(activityDesc, Priority.ALWAYS);
 
         activityContent.getChildren().addAll(metricBox, vSep, activityDesc);
-        activitySection.getChildren().addAll(activityTitle, activityContent);
+
+        // Chart Rata-rata Nilai per Kuis
+        CategoryAxis xAxis = new CategoryAxis();
+        xAxis.setLabel("Kuis");
+        NumberAxis yAxis = new NumberAxis(0, 100, 20);
+        yAxis.setLabel("Rata-rata Nilai");
+        BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
+        barChart.setTitle("Rata-rata Nilai per Kuis");
+        barChart.setLegendVisible(false);
+        barChart.setMinHeight(250);
+        barChart.setAnimated(true);
+        barChart.setCategoryGap(20);
+
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        // Hitung rata-rata per kuis
+        java.util.Map<String, java.util.List<Integer>> scoresPerQuiz = new java.util.HashMap<>();
+        for (QuizService.QuizAttemptData att : teacherAttempts) {
+            scoresPerQuiz.putIfAbsent(att.getQuizTitle(), new java.util.ArrayList<>());
+            scoresPerQuiz.get(att.getQuizTitle()).add(att.getScore());
+        }
+
+        for (java.util.Map.Entry<String, java.util.List<Integer>> entry : scoresPerQuiz.entrySet()) {
+            double sum = 0;
+            for (int s : entry.getValue()) sum += s;
+            double avg = sum / entry.getValue().size();
+            
+            String shortTitle = entry.getKey().length() > 15 
+                                ? entry.getKey().substring(0, 15) + "..." 
+                                : entry.getKey();
+            series.getData().add(new XYChart.Data<>(shortTitle, avg));
+        }
+        barChart.getData().add(series);
+
+        activitySection.getChildren().addAll(activityTitle, activityContent, barChart);
 
         // Aktivitas Kuis Terbaru Kelas
         VBox recentHistorySection = new VBox(10);
